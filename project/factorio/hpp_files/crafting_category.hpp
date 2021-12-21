@@ -11,5 +11,6 @@ class Crafting_category : public Item{
 public:
    //Crafting_category(std::pair<std::string, json>);
   Crafting_category(std::string);
+  Crafting_category();
 
 };

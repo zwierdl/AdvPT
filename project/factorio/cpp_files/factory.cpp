@@ -8,6 +8,17 @@ Factory::Factory(std::pair<std::string, json> input): Item(input.first, "factory
   }
 }
 
+/*Factory::Factory(std::string name, json input): Item(name, "factory"){   //anstatt "factory" muss type vielleicht "item" sein?!
+  crafting_speed = input["crafting_speed"];
+  std::map <std::string, json> crafting_categories_json_map = input["crafting_categories"];
+  for (std::pair<std::string, json> i : crafting_categories_json_map){
+    crafting_categories.push_back(Crafting_category(i.first));
+  }
+}*/
+
+Factory::Factory(){};
+
+
 json& operator<<(json& out, const Factory& factory){
   out[factory.name]["crafting_speed"] = factory.crafting_speed;
   for (Crafting_category i : factory.crafting_categories){
@@ -27,6 +38,6 @@ json& operator<<(json& out, const Factory& factory){
 std::ostream& operator<<(std::ostream& out, const Factory& factory){
   json j;
   j << factory;
-  out << j << std::endl;
+  out << std::setw(2) << j << std::endl;
   return out;
 }

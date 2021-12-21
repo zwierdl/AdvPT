@@ -1,184 +1,208 @@
 # include "simulator.hpp"
 
-Simulator::Simulator(){
+Simulator::Simulator(std::string challenge){
+  /*
+  std::ifstream file ("../factorio-data/item.json");
+  file >> items;
+  file.close();
+  */
+  //std::cout << items << "items\n\n" << std::endl;
+
+
+  /*
+  file.open("../factorio-data/recipe.json");
+  file >> recipes;
+  file.close();
+  */
+  //std::cout << "recipe\n\n" << std::endl;
+
+  /*
+  file.open("../factorio-data/technology.json");
+  file >> technologies;
+  file.close();
+  */
+  //std::cout << "technology\n\n" << std::endl;
+
+  /*
+  file.open("../factorio-data/factory.json");
+  file >> factories;
+  file.close();
+  */
+  //std::cout << "factories\n\n" << std::endl;
+
+  /*
+  std::string challenge_path("../factorio-data/");
+  challenge_path+= challenge;
+
+  std::cout << challenge_path << std::endl;
+
+  file.open(challenge_path.c_str());
+  file >> initial;
+  file.close();
+
+  for (json::iterator i = items.begin(); i != items.end(); ++i){
+    (*i)["stock"] = 0;
+  }
+
+
+  std::string name;
+  for (json::iterator i = initial["initial-items"].begin(); i != initial["initial-items"].end(); ++i){
+    name = (*i)["name"];
+    items.operator[](name)["stock"] = (*i)["amount"];
+  }
+
+  */
+
   std::ifstream in("../factorio-data/factory.json");
   json myjson;
   in >> myjson;
+
   std::unordered_map<std::string, json> factories_json_map = myjson;
-
-  //Factory factory;
-
-  for (std::pair<std::string, json> i : factories_json_map){
+  /*for (std::pair<std::string, json> i : factories_json_map){
     factories_blueprint.push_back(Factory(i));
-    //factories_blueprint[i.first] = Factory(i);
-    /*factory.name = i.first;
-    factory.crafting_speed = i.second["crafting_speed"];
-
-    std::unordered_map<std::string, json> crafting_categories_json_map = i.second["crafting_categories"];
-
-    for (std::pair<std::string, json> j : crafting_categories_json_map){
-
-    }*/
-
-  }
-  for (Factory i : factories_blueprint){
-    std::cout << i << std::endl;
-  }
-  /*std::vector<json> json_vector = myjson;
-
-  for (json i : json_vector){
-    std::cout << i << std::endl;
-  }
-  */
-
-
-
-  /*for (json::iterator it = myjson.begin(); it != myjson.end(); ++it){
-    json_vector.push_back(it);
   }*/
 
-  /*std::unordered_map<std::string, json> map = myjson;
-
-  for (std::pair<std::string, json> i : map){
-    std::cout << i.first << i.second <<std::endl;
-  }
-  */
-  //Factory factory;
-  //Crafting_category crafting_category;
-  /*for (json::iterator it = myjson.begin(); it != myjson.end(); ++it){
-    factory.name = it.key();
-    factory.crafting_speed = it(0);
-    for (json::iterator it2 = it["crafting_categories"].begin(), it != it["crafting_categories"].end(); ++it){
-      crafting_category.name = it2.key();
-      factory.crafting_categories.pushback(crafting_category);
-    }
-    factories_blueprint.pushback(factory);
-  }
-  */
-  myjson.clear();
-
-  std::cout << "json cleared:\n\n" << myjson << std::endl;
-
-  in.close();
-
-  in.open("../factorio-data/item.json");
-  in >> myjson;
-
-  std::cout << "item-json: \n" << myjson << std::endl;
-
-  std::unordered_map<std::string, json> items_json_map = myjson;
-
-  for (std::pair<std::string, json> i : items_json_map){
-    items_blueprint.push_back(Item(i));
+  for (std::pair<std::string, json> i : factories_json_map){
+    factories_blueprint[i.first] = Factory(i);
   }
 
-  for (Item i : items_blueprint){
-    std::cout << i << std::endl;
+  std::cout << "\nfactories:\n" << std::endl;
+  for (std::pair<std::string, Factory> i : factories_blueprint){
+    std::cout << "\n" << i.first << std::endl;
+    std::cout << i.second << std::endl;
   }
 
-  /*Item item;
-  for (json::iterator it = myyson.begin(); it != myjson.end(); ++it){
-    item.name = it.key();
-    item.type = it["type"];
-    items_blueprint.pushback(item);
-  }
-  */
   myjson.clear();
   in.close();
+
 
   in.open("../factorio-data/recipe.json");
   in >> myjson;
 
   std::unordered_map<std::string, json> recipes_json_map = myjson;
-
   for (std::pair<std::string, json> i : recipes_json_map){
-    recipes_blueprint.push_back(Recipe(i));
+    //recipes_blueprint.push_back(Recipe(i));
+    recipes_blueprint[i.first] = Recipe(i, items_blueprint);
   }
 
-  std::cout << "/nRecipes:/n";
-
-  for (Recipe i : recipes_blueprint){
-    std::cout << i << std::endl;
+  std::cout << "\nRecipes:\n" << std::endl;
+  for (std::pair<std::string,Recipe> i : recipes_blueprint){
+    std::cout << i.first << std::endl << i.second << std::endl;
   }
 
-  /*
-  Recipe recipe;
-  Item ingredient;
-  Item product;   //hier stimmt doch was nicht!
-  for (json::iterator it = myyson.begin(); it != myjson.end(); ++it){
-    recipe.name = it.key();
-    recipe.crafting_category = it["category"];
-    recipe.endabled = it["enabled"];
-    recipe.energy = it["energy"];
-
-    for (json::iterator it2 = it["ingredients"].begin(); it2 != it["ingredients"].end(), ++it2){
-      ingredient.first.name = it2["name"];
-      ingredient.second = it2["amaount"];
-      recipe.ingredients.pushback(ingredient);
-    }
-
-    for (json::iterator it2 = it["products"].begin(); it2 != it["products"].end(); ++it2){
-      product.first.name = it2["name"];
-      product.second = it2["amount"];
-      recipe.products.pushback(product);
-    }
-
-    recipes_blueprint.pushback(recipe);
-  }
-  */
   myjson.clear();
   in.close();
+
 
   in.open("../factorio-data/technology.json");
   in >> myjson;
-
-  std::unordered_map<std::string, json> technologies_json_map;
-
+  //std::cout << "technologies reading" << std::endl;
+  std::unordered_map<std::string, json> technologies_json_map = myjson;
   for (std::pair<std::string, json> i : technologies_json_map){
-    technologies_blueprint.push_back(Technology(i));
-  }
-  std::cout << "\nTechnologies:\n";
-  for (Technology i : technologies_blueprint){
-    std::cout << i << std::endl;
+    //technologies_blueprint.push_back(Technology(i));
+    technologies_blueprint[i.first] = Technology(i, items_blueprint, recipes_blueprint);
   }
 
-  /*
-  Technology technology;
-  Recipe effect;
-  st::pair<Item, int> ingredient;
-  Technology prerequisite;
-  for (json::iterator it = myjson.begin(); it != myjson.end(); ++it){
-    technology.name = it.key();
-
-    for (json::iterator it2 = it["effects"].begin(); it2 != it.end["effects"](); ++it2){
-      effect.name = it2.key();
-      technology.effects.pushback(effect);
+  /*for (std::pair<std::string, Technology> i : technologies_blueprint){
+    for (std::string j : i.second.prerequisites_string){
+      i.second.prerequisites_technology.push_back(techn)
     }
+  }*/
 
-    for (json::iterator it2 = it["ingredients"].begin(); it2 != it["ingredients"].end(); ++it2){
-      ingredient.first.name = it2["name"];
-      ingredient.second = it2["amount"];
-      technology.ingredients.pushback(ingredient);
-    }
-
-    for (json::iterator it2 = it["preequisites"].begin(); it2 != it["perquesities"].end(); ++it2){
-      prerequisite.name = it;  //?????
-      technology.prerequisites.pushback(prerequisite);
-
-    }
-    technologies_blueprint.pushback(technology);
+  std::cout << "\nTechnologies:\n" << std::endl;
+  for (std::pair<std::string, Technology> i : technologies_blueprint){
+    std::cout << i.first << std::endl << i.second << std::endl;
   }
 
-
-  technologies_blueprint = myjson;
-
-*/
   myjson.clear();
   in.close();
 
+  in.open("../factorio-data/item.json");
+  in >> myjson;
+
+  std::unordered_map<std::string, json> items_json_map = myjson;
+  for (std::pair<std::string, json> i : items_json_map){
+    //items_blueprint.push_back(Item(i));
+    items_blueprint[i.first] = Item(i);
+  }
+
+  for (std::pair<std::string, Factory> i : factories_blueprint){
+    //items_blueprint[i.first] = Item(i.first, "factory");
+    items_blueprint[i.first] = i.second;
+  }
+  for (std::pair<std::string, Recipe> i : recipes_blueprint){   //wahrscheinlich unnoeting
+    //items_blueprint[i.first] = Item(i.first, "recipe");
+    items_blueprint[i.first] = i.second;
+  }
+  for (std::pair<std::string, Technology> i : technologies_blueprint){
+    //items_blueprint[i.first] = Item(i.first, "technology");
+    items_blueprint[i.first] = i.second;
+  }
+
+  std::cout << "\nItems:\n" << std::endl;
+  for (std::pair<std::string, Item> i : items_blueprint){
+    std::cout << i.first << std::endl << i.second << std::endl;
+  }
+
+  myjson.clear();
+  in.close();
+
+
+  in.open(challenge.c_str());
+  in >> initial;
+
+  for (json::iterator i = initial["initial-items"].begin(); i != initial["initial-items"].end(); ++i){
+    items_blueprint[(*i)["name"]].stock = (*i)["amount"];
+  }
+
+  /*for (json::iterator i = initial["initial-factories"].begin(); i != initial["initial-factories"].end(); ++i){
+    items_blueprint[(*i)]"factory-type"].stock = 1;
+    factories_blueprint[(*i)]
+  }*/
+
+  in.close();
+
+}
 /*
-  in.open("../json/factorio-simulator/inputs/challange-1");
-  in >> initial_json;
-  in.close()
-*/
+std::deque<std::tupel<Item, int, Item>> Simulator::basicBuildOrder(){
+  */
+
+  /*
+  std::deque <std::pair<std::string, int>> toProduce;
+
+  for (json::iterator i = initial["goal-items"].begin(); i != initial["goal-items"].end(); ++i){
+      toProduce.push_back(std::pair<std::string, int>((*i)["name"], (*i)["amount"]));
+  }
+
+  for (std::pair<std::string, int> i : toProduce){
+    //std::cout << "name: " << i.first << "amount" << i.second << std::endl;
+
+  }*/
+  /*
+  std::deque<std::pair<std::string, int>> produced;
+
+  while (!toProduce.empty()){
+    json recipe = recipes.find[toProduce.pop_front()];
+
+    for (json:iter)
+  }
+  */
+  /*
+  return std::deque<std::string>();
+}*/
+
+void Simulator::printRecipeDoubles(){
+    /*for (json::iterator recipe1 = recipes.begin(); recipe1 != recipes.end(); ++recipe1){
+    for (json::iterator recipe2 = recipe1 ; recipe2 != recipes.end(); ++recipe2){
+      if (recipe1 != recipe2){
+        for (json::iterator product1 = (*recipe1)["products"].begin(); product1 !=(*recipe1)["products"].end(); ++product1){
+          for (json::iterator product2 = (*recipe2)["products"].begin(); product2 != (*recipe2)["products"].end(); ++product2){
+            if ((*product1)["name"] == (*product2)["name"]){
+              std::cout << "Product : " << (*product1)["name"] << "\nRecipe1: \n" << recipe1.key() << "\n" << (*recipe1) << "\nRecipe2: \n" <<  recipe2.key() << "\n" << (*recipe2) << "\n" << std::endl;
+            }
+          }
+        }
+      }
+    }
+  }*/
 }
