@@ -14,6 +14,7 @@ public:
   Factory(std::pair<std::string, json>);
   //Factory(std::string, json);
   Factory();
+  Factory(std::string, int, std::string, std::unordered_map<std::string, Factory>&);
 
   friend json& operator<<(json& out, const Factory& factory);
   friend std::ostream& operator<<(std::ostream& out, const Factory& factory);

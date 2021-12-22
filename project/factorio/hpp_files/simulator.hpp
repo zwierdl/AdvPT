@@ -19,8 +19,10 @@ public:
 
   Simulator(const std::string);
 
+  void buildBasicBuildOrder();
+
   //std::deque<std::tupel<Item, int, Item>> basicBuildOrder();
-  void printRecipeDoubles();
+  //void printRecipeDoubles();
 /*
   json items;
   json recipes;
@@ -37,7 +39,11 @@ public:
   //std::map<std::string, Factory> factories_blueprint;
   std::unordered_map<std::string, Factory> factories_blueprint;
   std::unordered_map<std::string, Recipe> recipes_blueprint;
+  std::unordered_multimap<std::string, std::pair<Recipe, int>> recipes_by_item;
   std::unordered_map<std::string, Technology> technologies_blueprint;
   std::unordered_map<std::string, Item> items_blueprint;
   json initial;
+  std::vector<Factory> factories;
+  std::vector<std::pair<Item, int>> goal;
+  std::deque<std::pair<std::pair<Item, int>, Item>> basicBuildOrder;
 };
