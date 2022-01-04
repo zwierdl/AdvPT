@@ -1,11 +1,11 @@
 #include "order.hpp"
 
-Order::Order(Item* item, int quantity, Recipe* recipe):
+Order::Order(Item* item, double quantity, Recipe* recipe):
 item(item),
 quantity(quantity),
 recipe(recipe){}
 
-Order::Order(Item* item, int quantity, Recipe* recipe, Order* purpose):
+Order::Order(Item* item, double quantity, Recipe* recipe, Order* purpose):
 item(item),
 quantity(quantity),
 recipe(recipe),

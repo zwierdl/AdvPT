@@ -25,6 +25,7 @@ public:
   const std::string factory_name;
   const int id = -1;
   Order current_job;
+  bool starved = false;
   //Recipe* default_job = nullptr;
 
 };

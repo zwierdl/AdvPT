@@ -1,4 +1,5 @@
 # include "simulator.hpp"
+#include <cmath>
 
 Simulator::Simulator(std::string challenge){
 
@@ -278,7 +279,7 @@ void Simulator::build_items(){
 
 void Simulator::process_order(Order order, std::list<Order>& list, std::list<Order>::iterator& iterator){
   Item* item_p = order.item;
-  int amount_ordered = order.quantity;
+  double amount_ordered = order.quantity;
 
   if (typeid(item_p) == typeid(Item*)){// wahrscheinlich unnoetig
     Recipe* recipe_p = item_p->best_recipe.first;
@@ -305,7 +306,7 @@ void Simulator::process_order(Order order, std::list<Order>& list, std::list<Ord
     for (auto& ingredient : recipe_p->ingredients){
       Item* item_ingredient_p = ingredient.first;
       int amount_consumed = ingredient.second;
-      process_order(Order(item_ingredient_p, (amount_ordered/amount_produced + 1) * amount_consumed, nullptr, purpose), list, iterator);
+      process_order(Order(item_ingredient_p, std::ceil(amount_ordered/amount_produced) * amount_consumed, nullptr, purpose), list, iterator);
     }
     if (item_p->type == "factory"){
       bool new_category = false;
@@ -377,6 +378,7 @@ void Simulator::restore_original_state(){
 
   for (auto& i : items_blueprint){
     Item* item_p = i.second;
+    item_p->stock = 0;
     item_p->energy = -1;
     item_p->best_recipe = std::pair<Recipe*, int>(nullptr, 0);
   }

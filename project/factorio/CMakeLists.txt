@@ -16,5 +16,7 @@ target_link_libraries(factorio factorylib)
 target_link_libraries(factorio crafting_categorylib)
 target_link_libraries(factorio hashlib)
 target_link_libraries(factorio orderlib)
+target_link_libraries(factorio event_generatorlib)
+target_link_libraries(factorio eventslib)
 
 target_link_libraries(factorio nlohmann_json::nlohmann_json)

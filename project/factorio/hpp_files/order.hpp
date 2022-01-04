@@ -7,12 +7,12 @@ class Crafting_category;
 
 class Order{
 public:
-  Order(Item*, int, Recipe*);
-  Order(Item*, int, Recipe*, Order*);
+  Order(Item*, double, Recipe*);
+  Order(Item*, double, Recipe*, Order*);
   Order();
 
   Item* item;
-  int quantity;
+  double quantity;
   Recipe* recipe;
   int ingredients_still_needed = 0;
   Order* purpose = nullptr;
