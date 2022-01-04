@@ -147,7 +147,7 @@ Simulator::Simulator(std::string challenge){
 
   int id = 0;
   for (json::iterator i = initial["initial-factories"].begin(); i != initial["initial-factories"].end(); ++i){
-    items_blueprint[(*i)["factory-type"]]->stock = 1;
+    items_blueprint[(*i)["factory-type"]]->stock = 1; // fehleranfaellig bessser ++
     factories.push_back(Factory((*i)["factory-type"], (*i)["factory-id"], (*i)["factory-name"], factories_blueprint));
     ++id;
   }
@@ -270,7 +270,7 @@ void Simulator::build_items(){
     Item* item_p = goal[index].first;
     int ordered_amount = goal[index].second;
     std::list<Order>::iterator iterator = buildOrder[index].end();
-    process_order(Order(item_p, ordered_amount, nullptr), buildOrder[index], iterator);
+    process_order(Order(item_p, ordered_amount, nullptr, nullptr), buildOrder[index], iterator);
     ++index;
   }
 }
@@ -280,7 +280,7 @@ void Simulator::process_order(Order order, std::list<Order>& list, std::list<Ord
   Item* item_p = order.item;
   int amount_ordered = order.quantity;
 
-  if (typeid(item_p) == typeid(Item*)){
+  if (typeid(item_p) == typeid(Item*)){// wahrscheinlich unnoetig
     Recipe* recipe_p = item_p->best_recipe.first;
     if (recipe_p == nullptr){
       unlock_missing_ingredient(item_p, list, iterator);
@@ -298,13 +298,14 @@ void Simulator::process_order(Order order, std::list<Order>& list, std::list<Ord
     if (item_p->name == "coal" && amount_ordered == 1){
       recipe_p = recipes_blueprint["coal"];
     }
-    list.insert(iterator, Order(item_p, amount_ordered, recipe_p));
+    list.insert(iterator, Order(item_p, amount_ordered, recipe_p, order.purpose));
     --iterator;
+    Order* purpose = &(*iterator);
     int amount_produced = item_p->best_recipe.second;
     for (auto& ingredient : recipe_p->ingredients){
       Item* item_ingredient_p = ingredient.first;
       int amount_consumed = ingredient.second;
-      process_order(Order(item_ingredient_p, (amount_ordered/amount_produced + 1) * amount_consumed, nullptr), list, iterator);
+      process_order(Order(item_ingredient_p, (amount_ordered/amount_produced + 1) * amount_consumed, nullptr, purpose), list, iterator);
     }
     if (item_p->type == "factory"){
       bool new_category = false;
@@ -346,10 +347,11 @@ void Simulator::research_Technology(Technology* technology_p, std::list<Order>& 
       research_Technology(prerequisite, list, iterator);
     }
   }
-  list.insert(iterator, Order(technology_p, 1, nullptr));
+  list.insert(iterator, Order(technology_p, 1, nullptr, nullptr));
   --iterator;
+  Order* purpose = &(*iterator);
   for (auto& i : technology_p->ingredients){
-    process_order(Order(i.first, i.second, nullptr), list, iterator);
+    process_order(Order(i.first, i.second, nullptr, purpose), list, iterator);
   }
   technology_p->researched = true;
   for (Recipe* effect : technology_p->effects){
@@ -371,6 +373,19 @@ void Simulator::restore_original_state(){
   for (auto& i : technologies_blueprint){
     Technology* technology_p = i.second;
     technology_p->researched = false;
+  }
+
+  for (auto& i : items_blueprint){
+    Item* item_p = i.second;
+    item_p->energy = -1;
+    item_p->best_recipe = std::pair<Recipe*, int>(nullptr, 0);
+  }
+
+  available_categories.clear(); //hier muessen noch die initial_factories wieder eingefuegt werden
+
+  for (auto& i : items_blueprint){
+    Item* item_p = i.second;
+    item_p->calculate_energy(available_categories);
   }
 }
 
@@ -423,19 +438,40 @@ void Simulator::restore_original_state(){
 
 }*/
 
+/*void Simulator::concartinate_identical_items(){
+  for (std::list<Order>& list : buildOrder){
+    std::list<Order>::iterator drag = list.begin();
+    if (!list.empty()){
+      for (std::list<Order>::iterator pos = ++list.begin(); pos != list.end(); ++pos){
+        if (drag->item == pos->item){
+          pos->quantity += drag->quantity;
+        }
+      }
+    }
+  }
+}*/
+
 void Simulator::printBuildOrder(std::ostream& out){
   for (auto& list : buildOrder){
     for (auto& order : list){
-      out << *order.item << order.quantity;
-      Item* purpose = order.purpose;
-      if (purpose != nullptr){
-        if (purpose->type == "recipe"){
-          out << *static_cast<Recipe*>(purpose) << std::endl;
-        }
-        else if(purpose->type == "technology"){
-          out << *static_cast<Technology*>(purpose) << std::endl;
-        }
+      out << *order.item << order.quantity << std::endl;
+      if (order.recipe != nullptr){
+        Recipe* recipe_p = order.recipe;
+        out << *recipe_p << std::endl;
       }
+      out << "ingredients_still_needed: " << order.ingredients_still_needed << std::endl;
+      if (order.purpose != nullptr){
+        out <<  "purpose: ";
+        out << *order.purpose->item <<std::endl;
+      }
+      /*if (recipe_p != nullptr){
+        if (recipe_p->type == "recipe"){
+          out << *static_cast<Recipe*>(recipe_p) << std::endl;
+        }
+        else if(recipe_p->type == "technology"){// unnoetig
+          out << *static_cast<Technology*>(recipe_p) << std::endl;
+        }
+      }*/
     }
   }
 }

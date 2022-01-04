@@ -2,7 +2,7 @@
 #include "recipe.hpp"
 #include "hash.hpp"
 
-Item::Item(std::pair<std::string, json> input): name(input.first), type(input.second["type"]){}
+Item::Item(std::pair<std::string, json> input): name(input.first), type("item"){}
 Item::Item(std::string name, std::string type): name(name), type(type){}
 Item::Item(){}
 

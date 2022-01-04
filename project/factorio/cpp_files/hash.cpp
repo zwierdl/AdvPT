@@ -10,9 +10,9 @@
   return std::hash<std::string>()(recipe.name);
 }*/
 
-/*size_t Hash::operator()(const Crafting_category& category) const{
+size_t Hash::operator()(const Crafting_category& category) const{
   return std::hash<std::string>()(category.name);
-}*/
+}
 
 size_t Hash::operator()(const Item& item) const{
   return std::hash<std::string>()(item.name);

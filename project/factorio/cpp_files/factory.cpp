@@ -25,7 +25,11 @@ Item(name, "factory"),
 id(id),
 factory_name(factory_name),
 crafting_speed(factories_blueprint[name]->crafting_speed),
-crafting_categories(factories_blueprint[name]->crafting_categories){}
+crafting_categories(factories_blueprint[name]->crafting_categories){
+  //switch (name){
+  //  case "assembling-machine-1"
+  //}
+}
 
 
 json& operator<<(json& out, const Factory& factory){
