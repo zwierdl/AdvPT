@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcrafting_categorylib.a  CMakeFiles/crafting_categorylib.dir/crafting_category.cpp.o
-/usr/bin/ranlib libcrafting_categorylib.a

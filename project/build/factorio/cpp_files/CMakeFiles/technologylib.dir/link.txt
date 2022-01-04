@@ -1,2 +1,0 @@
-/usr/bin/ar qc libtechnologylib.a  CMakeFiles/technologylib.dir/technology.cpp.o
-/usr/bin/ranlib libtechnologylib.a
