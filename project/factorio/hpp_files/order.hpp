@@ -1,14 +1,19 @@
 #pragma once
 
 class Crafting_category;
-
+#include "recipe.hpp"
 #include "item.hpp"
 
 
 class Order{
 public:
-  Order(Item*, int, Item*);
+  Order(Item*, int, Recipe*);
+  Order(Item*, int, Recipe*, Order*);
+  Order();
+
   Item* item;
   int quantity;
-  Item* purpose;
+  Recipe* recipe;
+  int ingredients_still_needed = 0;
+  Order* purpose = nullptr;
 };

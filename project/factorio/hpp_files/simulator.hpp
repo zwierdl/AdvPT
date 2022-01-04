@@ -31,6 +31,7 @@ public:
   void research_Technology(Technology*, std::list<Order>&, std::list<Order>::iterator);
   void unlock_missing_ingredient(Item*, std::list<Order>&, std::list<Order>::iterator);
   void restore_original_state();
+  //void concartinate_identical_items();
   //void generate_events();
   //void calculate_energies();
   //void addTechnologies();

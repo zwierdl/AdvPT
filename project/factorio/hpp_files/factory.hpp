@@ -6,6 +6,7 @@
 #include "nlohmann/json.hpp"
 #include "crafting_category.hpp"
 #include "item.hpp"
+#include "order.hpp"
 
 using json = nlohmann::json;
 
@@ -23,5 +24,7 @@ public:
   std::vector<Crafting_category> crafting_categories;
   const std::string factory_name;
   const int id = -1;
+  Order current_job;
+  //Recipe* default_job = nullptr;
 
 };
