@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../factorio/hpp_files/events.hpp
+iostream
+-
+iomanip
+-
+cstdlib
+-
+nlohmann/json.hpp
+../factorio/hpp_files/nlohmann/json.hpp
+
+/mnt/d/studium/vorlesungen/advanced_programming_techniques/AdvPT/project/factorio/cpp_files/events.cpp
+events.hpp
+/mnt/d/studium/vorlesungen/advanced_programming_techniques/AdvPT/project/factorio/cpp_files/events.hpp
+

@@ -1,0 +1,2 @@
+/usr/bin/ar qc librecipelib.a  CMakeFiles/recipelib.dir/recipe.cpp.o
+/usr/bin/ranlib librecipelib.a

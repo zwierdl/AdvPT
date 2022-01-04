@@ -1,0 +1,2 @@
+/usr/bin/ar qc libitemlib.a  CMakeFiles/itemlib.dir/item.cpp.o
+/usr/bin/ranlib libitemlib.a

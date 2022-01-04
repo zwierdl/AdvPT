@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../factorio/hpp_files/crafting_category.hpp
+string
+-
+nlohmann/json.hpp
+../factorio/hpp_files/nlohmann/json.hpp
+item.hpp
+../factorio/hpp_files/item.hpp
+
+../factorio/hpp_files/item.hpp
+string
+-
+iostream
+-
+vector
+-
+unordered_set
+-
+nlohmann/json.hpp
+../factorio/hpp_files/nlohmann/json.hpp
+
+/mnt/d/studium/vorlesungen/advanced_programming_techniques/AdvPT/project/factorio/cpp_files/crafting_category.cpp
+crafting_category.hpp
+/mnt/d/studium/vorlesungen/advanced_programming_techniques/AdvPT/project/factorio/cpp_files/crafting_category.hpp
+
