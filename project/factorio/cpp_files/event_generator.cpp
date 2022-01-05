@@ -41,25 +41,32 @@ void Event_generator::generate_events(){
   while(!future_events.empty()){
     Stop_factory_event event = future_events.top();
     future_events.pop();
+    if (factories[event.factory_id]->destroyed){
+      continue;
+    }
     if (factories[event.factory_id]->current_job.purpose != nullptr){
       --factories[event.factory_id]->current_job.purpose->ingredients_still_needed;
     }
     output += event;
-    std::cout << event << std::endl;
+    //std::cout << event << std::endl;
     time = event.timestamp;
 
     if (factories[event.factory_id]->current_job.item->type == "factory"){
+      for (int i = 0; i < factories[event.factory_id]->current_job.quantity; ++i){
         Factory* new_factory = new Factory(factories[event.factory_id]->current_job.item->name, factories.size(), "dummy-factory-name", factories_blueprint);
         factories.push_back(new_factory);
         output += Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name);
-        std::cout << Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name) <<std::endl;
+        //std::cout << Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name) <<std::endl;
         find_work(new_factory);
+      }
     }
 
     find_work(factories[event.factory_id]);
     for (int i = 0; i < starved_factories.size(); ++i){
-      starved_factories.front()->starved = false;
-      find_work(starved_factories.front());
+      if (!starved_factories.front()->destroyed){
+        starved_factories.front()->starved = false;
+        find_work(starved_factories.front());
+      }
       starved_factories.pop_front();
     }
     /*for (Factory* factory_p : starved_factories){
@@ -67,6 +74,8 @@ void Event_generator::generate_events(){
       starved_factories.pop_front();
     }*/
   }
+
+  output += Victory_event(time);
 }
 
 
@@ -78,7 +87,7 @@ void Event_generator::find_work(Factory* factory_p){
       if (order.ingredients_still_needed == 0){
         if (order.item->type == "technology"){
           output += Research_event(time, order.item->name);
-          std::cout << Research_event(time, order.item->name);
+          //std::cout << Research_event(time, order.item->name);
           Technology* technology_p = static_cast<Technology*>(order.item);
           technology_p->researched == true;
           for (Recipe* effect : technology_p->effects){
@@ -114,10 +123,12 @@ void Event_generator::find_work(Factory* factory_p){
             }
             if (recipe_can_be_executed){  //hier muessen noch die factories destroyed werden
               for (std::pair<Item*, int>& ingredient : order.recipe->ingredients){
-                if (factories_blueprint.contains(ingredient.first->name)){
-                  for (int i = 0; i < ingredient.second; ++i){
+                //if (factories_blueprint.contains(ingredient.first->name)){
+                if (ingredient.first->type == "factory"){
+                  for (int i = 0; i < ingredient.second * std::ceil(order.quantity/order.recipe->products[0].second); ++i){ //stimmt nicht products[0] muss ersetzt werden
                     for (Factory* ingredient_factory : factories){
-                      if (ingredient.first->name == ingredient_factory->name && ingredient_factory != factory_p){
+                      if (ingredient.first->name == ingredient_factory->name && ingredient_factory != factory_p && !ingredient_factory->destroyed){
+                        ingredient_factory->destroyed = true;
                         if (ingredient_factory->starved){
                           for (std::deque<Factory*>::iterator starved_factory = starved_factories.begin(); starved_factory != starved_factories.end(); ++starved_factory){
                             if ((*starved_factory)->id == ingredient_factory->id){
@@ -129,12 +140,15 @@ void Event_generator::find_work(Factory* factory_p){
                         else {
                           build_order[0].push_front(ingredient_factory->current_job);
                           output += Stop_factory_event(time, ingredient_factory->id);
-                          std::cout << Stop_factory_event(time, ingredient_factory->id) << std::endl;
+                          //std::cout << Stop_factory_event(time, ingredient_factory->id) << std::endl;
                         }
                         output += Destroy_factory_event(time, ingredient_factory->id);//hier muss noch die Factory aus dem Vector geloescht werden und deleted werden
-                        std::cout << Destroy_factory_event(time, ingredient_factory->id) << std::endl;
+                        //std::cout << Destroy_factory_event(time, ingredient_factory->id) << std::endl;
                         break;
 
+                      }
+                      if (ingredient_factory->id == factories.size()-1){
+                        std::cerr << "no factory found: " << ingredient.first->name << std::endl;
                       }
                     }
 
@@ -144,7 +158,7 @@ void Event_generator::find_work(Factory* factory_p){
               factory_p->current_job = order;
               list.erase(iterator);
               output += Start_factory_event(time, factory_p->id, order.recipe->name);
-              std::cout << Start_factory_event(time, factory_p->id, order.recipe->name) << std::endl;
+              //std::cout << Start_factory_event(time, factory_p->id, order.recipe->name) << std::endl;
               long long int time_finished = time + static_cast<int>(std::ceil(std::ceil(order.quantity/order.recipe->products[0].second)  * order.recipe->energy / factory_p->crafting_speed)) ; //stimmt noch nicht products[0] koennte falsch sein
               future_events.push(Stop_factory_event(time_finished, factory_p->id));
               return;

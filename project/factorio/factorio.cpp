@@ -22,7 +22,8 @@ int main(int argc, char* argv[]){
   simulator.restore_original_state();
 
   //simulator.printItems(std::cout);
-  simulator.printBuildOrder(std::cout);
+  //simulator.print_factories(std::cout);
+  //simulator.printBuildOrder(std::cout);
   //std::cout << simulator.initial << std::endl;
   Event_generator event_generator(simulator.buildOrder, simulator.initial, simulator.factories_blueprint, simulator.items_blueprint);
   event_generator.generate_events();

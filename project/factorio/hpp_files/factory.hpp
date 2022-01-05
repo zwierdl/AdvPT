@@ -26,6 +26,7 @@ public:
   const int id = -1;
   Order current_job;
   bool starved = false;
+  bool destroyed = false;
   //Recipe* default_job = nullptr;
 
 };

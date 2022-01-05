@@ -41,6 +41,7 @@ public:
   //void process_technology(std::list::iterator, Technology*, std::list<Order>&){};
   void printBuildOrder(std::ostream&);
   void printItems(std::ostream&);
+  void print_factories(std::ostream&);
   //void addTechnologies();
   std::unordered_map<std::string, Item*> items_blueprint;
   std::unordered_map<std::string, Recipe*> recipes_blueprint;

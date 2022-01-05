@@ -57,10 +57,6 @@
       {
           "name":"rocket-silo",
           "amount":1
-      },
-      {
-          "name":"spidertron",
-          "amount":1
       }
     ]
 }

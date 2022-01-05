@@ -456,8 +456,8 @@ void Simulator::restore_original_state(){
 void Simulator::printBuildOrder(std::ostream& out){
   for (auto& list : buildOrder){
     for (auto& order : list){
-      out << *order.item << order.quantity << std::endl;
-      if (order.recipe != nullptr){
+      out << *order.item << std::endl << order.quantity << std::endl;
+      /*if (order.recipe != nullptr){
         Recipe* recipe_p = order.recipe;
         out << *recipe_p << std::endl;
       }
@@ -465,14 +465,6 @@ void Simulator::printBuildOrder(std::ostream& out){
       if (order.purpose != nullptr){
         out <<  "purpose: ";
         out << *order.purpose->item <<std::endl;
-      }
-      /*if (recipe_p != nullptr){
-        if (recipe_p->type == "recipe"){
-          out << *static_cast<Recipe*>(recipe_p) << std::endl;
-        }
-        else if(recipe_p->type == "technology"){// unnoetig
-          out << *static_cast<Technology*>(recipe_p) << std::endl;
-        }
       }*/
     }
   }
@@ -481,6 +473,13 @@ void Simulator::printItems(std::ostream& out){
   out << "\nItems:\n" << std::endl;
   for (std::pair<std::string, Item*> i : items_blueprint){
     out<< i.first << std::endl << *i.second << std::endl;
+  }
+}
+
+void Simulator::print_factories(std::ostream& out){
+  out << "\nFactories: \n" << std::endl;
+  for (std::pair<std::string, Factory*> i : factories_blueprint){
+    out << *i.second << std::endl;
   }
 }
 
