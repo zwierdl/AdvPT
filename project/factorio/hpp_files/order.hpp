@@ -7,13 +7,14 @@ class Crafting_category;
 
 class Order{
 public:
-  Order(Item*, double, Recipe*);
-  Order(Item*, double, Recipe*, Order*);
+  Order(Item*, double, std::pair<Recipe*, int>);
+  Order(Item*, double, std::pair<Recipe*, int>, Order*);
   Order();
+
 
   Item* item;
   double quantity;
-  Recipe* recipe;
+  std::pair<Recipe*, int> recipe = std::pair<Recipe*, int>(nullptr, 0);
   int ingredients_still_needed = 0;
   Order* purpose = nullptr;
 };

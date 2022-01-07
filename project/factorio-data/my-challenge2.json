@@ -1,0 +1,30 @@
+{
+    "initial-items":[
+
+    ],
+    "initial-factories":[
+        {
+            "factory-type":"player",
+            "factory-id":0,
+            "factory-name":"player"
+        }
+    ],
+    "goal-items":[
+      {
+          "name":"stone-furnace",
+          "amount":1
+      },
+      {
+          "name":"steel-furnace",
+          "amount":1
+      },
+      {
+          "name":"assembling-machine-1",
+          "amount":1
+      },
+      {
+          "name":"assembling-machine-2",
+          "amount":1
+      }
+    ]
+}

@@ -31,6 +31,15 @@ crafting_categories(factories_blueprint[name]->crafting_categories){
   //}
 }
 
+void Factory::shrink_job(int time_aborted){
+  int count_recipe_completed = (time_aborted - time_job_started) / (current_job.recipe.first->energy / crafting_speed);
+  int amount_already_produced = current_job.recipe.second * count_recipe_completed;
+  current_job.quantity -= amount_already_produced;
+  if (current_job.quantity < 0){
+    current_job.quantity = 0;
+  }
+}
+
 
 json& operator<<(json& out, const Factory& factory){
   out[factory.name]["crafting_speed"] = factory.crafting_speed;

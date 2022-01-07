@@ -1,18 +1,18 @@
 #include "order.hpp"
 
-Order::Order(Item* item, double quantity, Recipe* recipe):
+Order::Order(Item* item, double quantity, std::pair<Recipe*, int> recipe):
 item(item),
 quantity(quantity),
 recipe(recipe){}
 
-Order::Order(Item* item, double quantity, Recipe* recipe, Order* purpose):
+Order::Order(Item* item, double quantity, std::pair<Recipe*, int> recipe, Order* purpose):
 item(item),
 quantity(quantity),
 recipe(recipe),
 purpose(purpose){
   if (typeid(item) == typeid(Item*)){
-    if (recipe != nullptr){
-      ingredients_still_needed = recipe->ingredients.size();
+    if (recipe.first != nullptr){
+      ingredients_still_needed = recipe.first->ingredients.size();
     }
   }
   if (item->type == "technology"){

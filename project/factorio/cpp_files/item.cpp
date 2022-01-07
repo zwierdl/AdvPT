@@ -56,6 +56,7 @@ std::ostream& operator<<(std::ostream& out, const Item& item){
 
 json& operator<<(json& out, const Item& item){
   out[item.name]["type"] = item.type;
+  out[item.name]["energy"] = item.energy;
   /*json j;
   Recipe* recipe_p = item.best_recipe.first;
   if (recipe_p != nullptr){
@@ -64,7 +65,7 @@ json& operator<<(json& out, const Item& item){
   //out[item.name]["best_recipe"] = j;
   //out[item.name]["energy"] = item.energy;
   /*out[item.name]["stock"] = item.stock;
-  out[item.name]["energy"] = item.energy;
+
   json recipes_json = json::array();
   for (auto& i : item.recipes){
     Recipe* recipe = static_cast<Recipe*>(i.first);

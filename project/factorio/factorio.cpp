@@ -1,11 +1,14 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <list>
 
+#include "order.hpp"
 #include "events.hpp"
 #include "event_generator.hpp"
 #include "recipe.hpp"
 #include "simulator.hpp"
+#include "factorio_game.hpp"
 #include"nlohmann/json.hpp"
 
 
@@ -16,16 +19,20 @@ int main(int argc, char* argv[]){
   file >> input;
   std::string challenge(input["challenge"]);
 
-  Simulator simulator(challenge);
+  Factorio_game factorio;
+
+  Simulator simulator(challenge, factorio);
 
   simulator.build_items();
-  simulator.restore_original_state();
 
   //simulator.printItems(std::cout);
+  simulator.restore_original_state();
   //simulator.print_factories(std::cout);
   //simulator.printBuildOrder(std::cout);
   //std::cout << simulator.initial << std::endl;
-  Event_generator event_generator(simulator.buildOrder, simulator.initial, simulator.factories_blueprint, simulator.items_blueprint);
+  Event_generator event_generator(factorio, simulator.initial);
   event_generator.generate_events();
   event_generator.print_events();
+  //simulator.print_technologies(std::cerr);
+  //simulator.printBuildOrder(std::cout);
 }

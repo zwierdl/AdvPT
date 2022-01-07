@@ -54,6 +54,7 @@ json& operator<<(json& out, const Technology& technology){
     //prerequisites_json += prerequisite_json;
   }
   out[technology.name]["prerequisites"] = prerequisites_json;
+  out[technology.name]["researched"] = technology.researched;
 
 
   return out;

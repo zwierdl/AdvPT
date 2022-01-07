@@ -17,6 +17,8 @@ public:
   Factory();
   Factory(const std::string&, int, const std::string&, std::unordered_map<std::string, Factory*>&);
 
+  void shrink_job(int);
+
   friend json& operator<<(json& out, const Factory& factory);
   friend std::ostream& operator<<(std::ostream& out, const Factory& factory);
 
@@ -25,6 +27,7 @@ public:
   const std::string factory_name;
   const int id = -1;
   Order current_job;
+  int time_job_started = -1;
   bool starved = false;
   bool destroyed = false;
   //Recipe* default_job = nullptr;
