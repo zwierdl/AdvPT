@@ -15,16 +15,8 @@
           "amount":1
       },
       {
-          "name":"steel-furnace",
-          "amount":1
-      },
-      {
-          "name":"assembling-machine-1",
-          "amount":1
-      },
-      {
-          "name":"assembling-machine-2",
-          "amount":1
+          "name":"burner-mining-drill",
+          "amount":15
       }
     ]
 }

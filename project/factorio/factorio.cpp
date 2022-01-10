@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
   //std::cout << simulator.initial << std::endl;
   Event_generator event_generator(factorio, simulator.initial);
   event_generator.generate_events();
-  event_generator.print_events();
+  //event_generator.print_events();
   //simulator.print_technologies(std::cerr);
   //simulator.printBuildOrder(std::cout);
 }

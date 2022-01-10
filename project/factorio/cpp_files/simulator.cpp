@@ -38,9 +38,6 @@ Simulator::Simulator(const std::string& challenge, Factorio_game& factorio):
 
   for (auto& i : items_blueprint){
     Item* item_p = i.second;
-    /*if (*item_p == *items_blueprint["stone-furnace"] || *item_p == *items_blueprint["stone"]){
-      std::cout << "stop";
-    }*/
     item_p->calculate_energy(available_categories);
   }
 
@@ -170,6 +167,20 @@ void Simulator::research_Technology(Technology* technology_p, std::list<Order>& 
   }
 
 }
+
+
+/*void sort_Orders_by_factories(){
+  for (std::list<Order>& list : buildOrder){
+    for (std::list<Order>::iterator pos = list.begin(); pos != list.end(); ++pos){
+      Crafting_category& category = *pos.recipe.first->crafting_category;
+      switch (category.name){
+        case ""
+      }
+
+
+    }
+  }
+}*/
 
 void Simulator::restore_original_state(){
   for (auto& i : recipes_blueprint){

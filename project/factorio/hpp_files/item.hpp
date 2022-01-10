@@ -22,6 +22,7 @@ public:
   Item(std::pair<std::string, json>);
   Item(std::string, std::string);
   Item();
+  virtual ~Item() = default;
 
   bool operator==(const Item&) const;
 

@@ -105,14 +105,14 @@ Factorio_game::Factorio_game(){
 
 Factorio_game::~Factorio_game(){
 
-  for (auto& i : items_blueprint){
-    delete items_blueprint[i.first];
-  }
   for (auto& i : recipes_blueprint){
-    delete recipes_blueprint[i.first];
+    delete i.second;
   }
   for (auto& i : technologies_blueprint){
-    delete technologies_blueprint[i.first];
+    delete i.second;
+  }
+  for (auto& i : items_blueprint){
+    delete i.second;
   }
 }
 
@@ -128,5 +128,5 @@ void Factorio_game::restore_original_state(){
     Technology* technology = i.second;
     technology->researched = false;
   }
-  
+
 }
