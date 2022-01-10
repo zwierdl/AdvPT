@@ -169,18 +169,44 @@ void Simulator::research_Technology(Technology* technology_p, std::list<Order>& 
 }
 
 
-/*void sort_Orders_by_factories(){
+void sort_Orders_by_factories(){
   for (std::list<Order>& list : buildOrder){
     for (std::list<Order>::iterator pos = list.begin(); pos != list.end(); ++pos){
-      Crafting_category& category = *pos.recipe.first->crafting_category;
-      switch (category.name){
-        case ""
+      if (*pos.item->type == "technology"){
+        build_order_by_factories[9].push_back(pos);
+      }
+      else{
+        Crafting_category& category = *pos.recipe.first->crafting_category;
+        switch (category.name){
+          case "wood-crafting":
+          case "basic-soldi":
+          case "crafting":
+          case "basic-crafting":
+          case "advanced-crafting":       build_order_by_factories[0].push_back(pos);
+                                          break;
+          case "crafting-with-fluid":     build_order_by_factories[1].push_back(pos);
+                                          break;
+          case "oil-processing":          build_order_by_factories[2].push_back(pos);
+                                          break;
+          case "chemistry":               build_order_by_factories[3].push_back(pos);
+                                          break;
+          case "rocket-building":         build_order_by_factories[4].push_back(pos);
+                                          break;
+          case "basic-smeling":           build_order_by_factories[5].push_back(pos);
+                                          break;
+          case "burner-solid":            build_order_by_factories[6].push_back(pos);
+                                          break;
+          case "basic-fluid":             build_order_by_factories[7].push_back(pos);
+                                          break;
+          case "water-pump":              build_order_by_factories[8].push_back(pos);
+                                          break;
+
       }
 
 
     }
   }
-}*/
+}
 
 void Simulator::restore_original_state(){
   for (auto& i : recipes_blueprint){

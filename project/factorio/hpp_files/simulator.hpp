@@ -48,6 +48,6 @@ public:
   std::vector<Factory> factories;
   std::vector<std::pair<Item*, int>> goal;
   std::vector<std::list<Order>>& buildOrder;
-  //std::unordered_map<Factory, std::list<std::list<Order>::iterator>> build_order_by_factories;
+  std::vector<std::list<std::list<Order>::iterator>> build_order_by_factories = std::vector<std::list<std::list<Order>::iterator>>(10);
 
 };

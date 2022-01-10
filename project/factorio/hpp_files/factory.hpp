@@ -30,6 +30,6 @@ public:
   int time_job_started = -1;
   bool starved = false;
   bool destroyed = false;
-  //Recipe* default_job = nullptr;
+  int build_order_index = -1;
 
 };
