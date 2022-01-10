@@ -18,6 +18,7 @@ public:
   Event_generator(Factorio_game&, json);
   ~Event_generator();
 
+  //void find_work2(Factory*);
   void find_work(Factory*);
   void generate_events();
   void print_events();
@@ -29,7 +30,8 @@ public:
   std::unordered_map<int, Factory*> factories;
   int next_factory_index = 0;
   std::unordered_map<std::string, Item*>& items_blueprint;
-  std::vector<std::list<Order>>& build_order;
+  std::list<Order>& build_order;
+  std::vector<std::list<std::list<Order>::iterator>>& build_order_by_factories;
   std::priority_queue<Stop_factory_event, std::vector<Stop_factory_event>, std::greater<Stop_factory_event>> future_events;
   std::list<Event*> events;
   long long int time = 0;

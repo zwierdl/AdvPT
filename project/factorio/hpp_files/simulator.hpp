@@ -32,7 +32,7 @@ public:
   void build_items();
   void research_Technology(Technology*, std::list<Order>&, std::list<Order>::iterator);
   void unlock_missing_ingredient(Item*, std::list<Order>&, std::list<Order>::iterator);
-  //void sort_Orders_by_factories();
+  void sort_Orders_by_factories();
   void restore_original_state();
   void printBuildOrder(std::ostream&);
   void printItems(std::ostream&);
@@ -47,7 +47,7 @@ public:
   json initial;
   std::vector<Factory> factories;
   std::vector<std::pair<Item*, int>> goal;
-  std::vector<std::list<Order>>& buildOrder;
-  std::vector<std::list<std::list<Order>::iterator>> build_order_by_factories = std::vector<std::list<std::list<Order>::iterator>>(10);
+  std::list<Order>& buildOrder;
+  std::vector<std::list<std::list<Order>::iterator>>& build_order_by_factories;
 
 };

@@ -7,7 +7,8 @@ Simulator::Simulator(const std::string& challenge, Factorio_game& factorio):
   factories_blueprint(factorio.factories_blueprint),
   recipes_blueprint(factorio.recipes_blueprint),
   technologies_blueprint(factorio.technologies_blueprint),
-  buildOrder(factorio.build_order){
+  buildOrder(factorio.build_order),
+  build_order_by_factories(factorio.build_order_by_factories){
 
   std::ifstream in(challenge.c_str());
   in >> initial;
@@ -66,11 +67,11 @@ Simulator::Simulator(const std::string& challenge, Factorio_game& factorio):
 void Simulator::build_items(){
   int index = 0;
   for (auto& i : goal){
-    buildOrder.push_back(std::list<Order>());
+    //buildOrder.push_back(std::list<Order>());
     Item* item_p = goal[index].first;
     int ordered_amount = goal[index].second;
-    std::list<Order>::iterator iterator = buildOrder[index].end();
-    process_order(Order(item_p, ordered_amount, std::pair<Recipe*, int>(nullptr, 0), nullptr), buildOrder[index], iterator);
+    std::list<Order>::iterator iterator = buildOrder.end();
+    process_order(Order(item_p, ordered_amount, std::pair<Recipe*, int>(nullptr, 0), nullptr), buildOrder, iterator);
     //std::cout << *i.first << std::endl;
     ++index;
   }
@@ -169,45 +170,28 @@ void Simulator::research_Technology(Technology* technology_p, std::list<Order>& 
 }
 
 
-void sort_Orders_by_factories(){
-  for (std::list<Order>& list : buildOrder){
-    for (std::list<Order>::iterator pos = list.begin(); pos != list.end(); ++pos){
-      if (*pos.item->type == "technology"){
-        build_order_by_factories[9].push_back(pos);
+void Simulator::sort_Orders_by_factories(){
+
+    for (std::list<Order>::iterator pos = buildOrder.begin(); pos != buildOrder.end(); ++pos){
+      if ((*pos).item->type == "technology"){
+                                                      build_order_by_factories[0].push_back(pos);
       }
       else{
-        Crafting_category& category = *pos.recipe.first->crafting_category;
-        switch (category.name){
-          case "wood-crafting":
-          case "basic-soldi":
-          case "crafting":
-          case "basic-crafting":
-          case "advanced-crafting":       build_order_by_factories[0].push_back(pos);
-                                          break;
-          case "crafting-with-fluid":     build_order_by_factories[1].push_back(pos);
-                                          break;
-          case "oil-processing":          build_order_by_factories[2].push_back(pos);
-                                          break;
-          case "chemistry":               build_order_by_factories[3].push_back(pos);
-                                          break;
-          case "rocket-building":         build_order_by_factories[4].push_back(pos);
-                                          break;
-          case "basic-smeling":           build_order_by_factories[5].push_back(pos);
-                                          break;
-          case "burner-solid":            build_order_by_factories[6].push_back(pos);
-                                          break;
-          case "basic-fluid":             build_order_by_factories[7].push_back(pos);
-                                          break;
-          case "water-pump":              build_order_by_factories[8].push_back(pos);
-                                          break;
-
+        const std::string& category = (*pos).recipe.first->crafting_category.name;
+        if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
+                                                      build_order_by_factories[1].push_back(pos);
+        else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(pos);
+        else if (category == "oil-processing")        build_order_by_factories[3].push_back(pos);
+        else if (category == "chemistry")             build_order_by_factories[4].push_back(pos);
+        else if (category == "rocket-building")       build_order_by_factories[5].push_back(pos);
+        else if (category == "basic-smelting")        build_order_by_factories[6].push_back(pos);
+        else if (category == "burner-solid")          build_order_by_factories[7].push_back(pos);
+        else if (category == "basic-fluid")           build_order_by_factories[8].push_back(pos);
+        else if (category == "water-pump")            build_order_by_factories[9].push_back(pos);
       }
-
-
     }
-  }
-}
 
+}
 void Simulator::restore_original_state(){
   for (auto& i : recipes_blueprint){
     Recipe*  recipe_p = i.second;
@@ -236,8 +220,7 @@ void Simulator::restore_original_state(){
 
 
 void Simulator::printBuildOrder(std::ostream& out){
-  for (auto& list : buildOrder){
-    for (auto& order : list){
+    for (auto& order : buildOrder){
       out << *order.item << std::endl << order.quantity << std::endl;
       /*if (order.recipe != nullptr){
         Recipe* recipe_p = order.recipe;
@@ -249,7 +232,7 @@ void Simulator::printBuildOrder(std::ostream& out){
         out << *order.purpose->item <<std::endl;
       }*/
     }
-  }
+
 }
 
 

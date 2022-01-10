@@ -1,6 +1,6 @@
 #include <unordered_map>
 #include <vector>
-#include <list> 
+#include <list>
 
 class Item;
 class Factory;
@@ -18,5 +18,6 @@ public:
   std::unordered_map<std::string, Factory*> factories_blueprint;
   std::unordered_map<std::string, Recipe*> recipes_blueprint;
   std::unordered_map<std::string, Technology*> technologies_blueprint;
-  std::vector<std::list<Order>> build_order;
+  std::list<Order> build_order;
+  std::vector<std::list<std::list<Order>::iterator>> build_order_by_factories = std::vector<std::list<std::list<Order>::iterator>>(10);
 };

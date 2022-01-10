@@ -26,27 +26,15 @@ id(id),
 factory_name(factory_name),
 crafting_speed(factories_blueprint[name]->crafting_speed),
 crafting_categories(factories_blueprint[name]->crafting_categories){
-  switch (name){
-    case "assembling-machine-1":
-    case "player":                build_order_index = 0;
-                                  break;
-    case "assembling-machine-2":  build_order_index = 1;
-                                  break;
-    case "oil-refinery":          build_order_index = 2;
-                                  break;
-    case "cemical-plan":          build_order_index = 3;
-                                  break;
-    case "rocket-silo":            build_order_index = 4;
-                                  break;
-    case "stone-furnace":         build_order_index = 5;
-                                  break;
-    case "burner-mining-drill":   build_order_index = 6;
-                                  break;
-    case "pump-jack":             build_order_index = 7;
-                                  break;
-    case "offshore-pump"          build_order_index = 8;
-                                  break;
-  }
+  if (name == "assembling-machine-1" || name == "player")   build_order_index = 1;
+  else if (name == "assembling-machine-2")                  build_order_index = 2;
+  else if (name == "oil-refinery")                          build_order_index = 3;
+  else if (name == "chemical-plant")                        build_order_index = 4;
+  else if (name == "rocket-silo")                           build_order_index = 5;
+  else if (name == "stone-furnace")                         build_order_index = 6;
+  else if (name == "burner-mining-drill")                   build_order_index = 7;
+  else if (name == "pumpjack")                              build_order_index = 8;
+  else if (name == "offshore-pump")                         build_order_index = 9;
 }
 
 void Factory::shrink_job(int time_aborted){
