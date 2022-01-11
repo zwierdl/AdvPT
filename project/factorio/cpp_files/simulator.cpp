@@ -9,7 +9,7 @@ Simulator::Simulator(const std::string& challenge, Factorio_game& factorio):
   technologies_blueprint(factorio.technologies_blueprint),
   buildOrder(factorio.build_order),
   build_order_by_factories(factorio.build_order_by_factories){
-
+//printItems(std::cerr);
   std::ifstream in(challenge.c_str());
   in >> initial;
 
@@ -46,6 +46,7 @@ Simulator::Simulator(const std::string& challenge, Factorio_game& factorio):
     goal.push_back(std::pair<Item*, int>(items_blueprint[(*i)["name"]], (*i)["amount"]));
     //goal.push_back(std::pair<Item, int>(Item((*i)["name"], "item"), (*i)["amount"]));
   }
+//printItems(std::cerr);
 
 
   /*
@@ -65,15 +66,32 @@ Simulator::Simulator(const std::string& challenge, Factorio_game& factorio):
 
 
 void Simulator::build_items(){
-  int index = 0;
+  std::list<Order>::iterator iterator = buildOrder.end();
+  process_order(Order(items_blueprint["stone-furnace"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["burner-mining-drill"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["assembling-machine-1"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["assembling-machine-2"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["offshore-pump"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["pumpjack"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["oil-refinery"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["chemical-plant"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+  process_order(Order(items_blueprint["rocket-silo"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr), buildOrder, iterator);
+  iterator = buildOrder.end();
+
   for (auto& i : goal){
-    //buildOrder.push_back(std::list<Order>());
-    Item* item_p = goal[index].first;
-    int ordered_amount = goal[index].second;
-    std::list<Order>::iterator iterator = buildOrder.end();
+//buildOrder.push_back(std::list<Order>());
+    Item* item_p = i.first;
+    int ordered_amount = i.second;
     process_order(Order(item_p, ordered_amount, std::pair<Recipe*, int>(nullptr, 0), nullptr), buildOrder, iterator);
-    //std::cout << *i.first << std::endl;
-    ++index;
+//std::cout << *i.first << std::endl;
   }
 }
 

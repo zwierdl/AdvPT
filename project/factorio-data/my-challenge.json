@@ -11,51 +11,7 @@
     ],
     "goal-items":[
       {
-          "name":"stone-furnace",
-          "amount":1
-      },
-      {
-          "name":"burner-mining-drill",
-          "amount":1
-      },
-      {
-          "name":"stone-furnace",
-          "amount":1
-      },
-      {
-          "name":"assembling-machine-1",
-          "amount":1
-      },
-      {
-          "name":"offshore-pump",
-          "amount":1
-      },
-      {
-          "name":"pumpjack",
-          "amount":1
-      },
-      {
-          "name":"oil-refinery",
-          "amount":1
-      },
-      {
-          "name":"chemical-plant",
-          "amount":1
-      },
-      {
-          "name":"assembling-machine-1",
-          "amount":1
-      },
-      {
-          "name":"assembling-machine-1",
-          "amount":1
-      },
-      {
-          "name":"assembling-machine-2",
-          "amount":1
-      },
-      {
-          "name":"rocket-silo",
+          "name":"spidertron",
           "amount":1
       }
     ]

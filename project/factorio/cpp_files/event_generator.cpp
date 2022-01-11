@@ -58,7 +58,7 @@ void Event_generator::generate_events(){
     output += event;
 //std::cout << event << std::endl;
 
-    if (factories[event.factory_id]->current_job.item->type == "factory"){
+    if (factories[event.factory_id]->current_job.item->type == "factory" && factories[event.factory_id]->current_job.item->name != "electric-furnace"){
       for (int i = 0; i < factories[event.factory_id]->current_job.quantity; ++i){
         Factory* new_factory = new Factory(factories[event.factory_id]->current_job.item->name, next_factory_index, "dummy-factory-name", factories_blueprint);
         //factories.push_back(new_factory);
@@ -85,6 +85,9 @@ std::cerr << factory << std::endl;
 
 
 void Event_generator::find_work(Factory* factory){
+  if (factory->build_order_index == -1){
+
+  }
   if (!build_order_by_factories[0].empty()){
     if((*build_order_by_factories[0].front()).ingredients_still_needed == 0){
       Order& order = *build_order_by_factories[0].front();
@@ -132,7 +135,7 @@ void Event_generator::find_work(Factory* factory){
         if (recipe_can_be_executed){  //hier muessen noch die factories destroyed werden
           for (std::pair<Item*, int>& ingredient : order.recipe.first->ingredients){
             //if (factories_blueprint.contains(ingredient.first->name)){
-            if (ingredient.first->type == "factory"){
+            if (ingredient.first->type == "factory" && ingredient.first->name != "electric-furnace"){
               for (int i = 0; i < ingredient.second * std::ceil(order.quantity/order.recipe.second); ++i){
                 for (auto& j : factories){
                   Factory* ingredient_factory = j.second;

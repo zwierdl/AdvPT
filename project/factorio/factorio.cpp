@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
   Factorio_game factorio;
 
   Simulator simulator(challenge, factorio);
-
+//simulator.printItems(std::cerr);
   simulator.build_items();
   simulator.sort_Orders_by_factories();
 
@@ -35,5 +35,5 @@ int main(int argc, char* argv[]){
   event_generator.generate_events();
   event_generator.print_events();
   //simulator.print_technologies(std::cerr);
-  simulator.printBuildOrder(std::cout);
+  simulator.printBuildOrder(std::cerr);
 }

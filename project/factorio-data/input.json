@@ -1,3 +1,4 @@
 {
-    "challenge": "../factorio-data/my-challenge.json"
+    "challenge": "../factorio-data/my-challenge.json",
+    "start_from_scratch" : true
 }
