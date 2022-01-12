@@ -1,3 +1,5 @@
+#pragma once
+
 #include "events.hpp"
 #include "item.hpp"
 #include "order.hpp"
