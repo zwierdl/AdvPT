@@ -224,7 +224,9 @@ void Simulator::sort_Orders_by_factories(){
 
 void Simulator::optimize(){
   build_items(factories_to_build_in_advance);
+  restore_original_state();
   int bestmark = generate_events();
+  restore_original_state();
 
   std::list<Order> factories_to_build_variant;
   std::list<Order> factories_to_build_best =  factories_to_build_in_advance;
@@ -237,7 +239,9 @@ void Simulator::optimize(){
       factories_to_build_variant = factories_to_build_in_advance;
       factories_to_build_variant.insert(item_and_insert_iterator.second, Order(item_and_insert_iterator.first, 1 , std::pair<Recipe*, int>(nullptr, 0), nullptr));
       build_items(factories_to_build_variant);
+      restore_original_state();
       int time = generate_events();
+      restore_original_state();
       if (time < bestmark){
         progress = true;
         factories_to_build_best = factories_to_build_variant;
@@ -248,6 +252,7 @@ void Simulator::optimize(){
 
   }
   build_items(factories_to_build_in_advance);
+  restore_original_state();
   generate_events();
 
 }
