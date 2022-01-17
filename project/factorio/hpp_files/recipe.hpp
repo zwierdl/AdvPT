@@ -7,9 +7,11 @@
 //class Item;
 class Technology;
 
+
 #include "item.hpp"
 #include "crafting_category.hpp"
-#include "technology.hpp"
+
+
 
 
 using json = nlohmann::json;

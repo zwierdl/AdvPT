@@ -1,8 +1,10 @@
 #pragma once
 
-class Crafting_category;
-#include "recipe.hpp"
-#include "item.hpp"
+#include <utility>
+
+//class Crafting_category;
+class Item;
+class Recipe;
 
 
 class Order{

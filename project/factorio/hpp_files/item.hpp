@@ -9,10 +9,6 @@ class Hash;
 class Recipe;
 
 #include "nlohmann/json.hpp"
-//#include "hash.hpp"
-//#include "recipe.hpp"
-
-
 
 using json = nlohmann::json;
 
@@ -34,9 +30,7 @@ public:
   const std::string name;
   const std::string type;
   std::pair<Recipe*, int> best_recipe = std::pair<Recipe*, int>(nullptr,0);
-  //std::vector<std::pair<Item*, int>> recipes_produce; //muss bei Zugriff zu Recipe* gecastet werden
   std::vector<std::pair<Recipe*, int>> recipes_produce;
-  //std::vector<std::pair<Item*, int>> recipes_consume; //muss bei Zugriff zu Recipe* gecastet werden
   std::vector<std::pair<Recipe*, int>> recipes_consume;
   int stock = 0;
   double energy = -1;

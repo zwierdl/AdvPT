@@ -9,9 +9,6 @@ using json = nlohmann::json;
 
 class Crafting_category : public Item{
 public:
-   //Crafting_category(std::pair<std::string, json>);
   Crafting_category(const std::string&);
   Crafting_category();
-
-  bool operator==(const Crafting_category&) const;
 };

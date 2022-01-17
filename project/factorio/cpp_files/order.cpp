@@ -1,4 +1,7 @@
 #include "order.hpp"
+#include "technology.hpp"
+#include "recipe.hpp"
+#include "item.hpp"
 
 Order::Order(Item* item, double quantity, std::pair<Recipe*, int> recipe):
 item(item),
@@ -18,23 +21,7 @@ purpose(purpose){
   if (item->type == "technology"){
     Technology* technology_p = static_cast<Technology*>(item);
     ingredients_still_needed = technology_p->prerequisites.size() + technology_p->ingredients.size();
-    /*for (Technology* prerequisite : technology_p->prerequisites){
-      if (!prerequisite->researched){
-        ++ingredients_still_needed;
-      }
-    }*/
   }
-  /*if (recipe != nullptr){
-    ingredients_still_needed = recipe->ingredients.size();  //muss man fuer prerequisites wahrscheinlich noch aendern
-  }
-  else if (item->type == "technology"){
-    Technology* technology_p = static_cast<Technology*>(item);
-    for (Technology* prerequisite : technology_p->prerequisites){
-      if (!prerequisite->researched){
-        ++ingredients_still_needed;
-      }
-    }
-  }*/
 }
 
 Order::Order(){}

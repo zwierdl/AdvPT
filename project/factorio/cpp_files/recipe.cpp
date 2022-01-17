@@ -1,4 +1,5 @@
 #include "recipe.hpp"
+#include "technology.hpp"
 
 Recipe::Recipe(const std::pair<std::string, json>& input, std::unordered_map<std::string, Item*>& items_blueprint):
   Item(input.first, "recipe"),
@@ -11,13 +12,11 @@ Recipe::Recipe(const std::pair<std::string, json>& input, std::unordered_map<std
     for (json i : ingredients_json_vector){
       Item* item_p = items_blueprint[i["name"]];
       ingredients.push_back(std::pair<Item*, int>(item_p, i["amount"]));
-      //ingredients.push_back(std::pair<std::string,int>(i["name"],i["amount"]));
     }
     std::vector<json> products_json_vector = input.second["products"];
 
     for (json i : products_json_vector){
       products.push_back(std::pair<Item*, int>(items_blueprint[i["name"]], i["amount"]));
-      //products.push_back(std::pair<std::string,int>(i["name"], i["amount"]));
     }
 }
 

@@ -1,3 +1,0 @@
-enum Factory_enum {
-
-}

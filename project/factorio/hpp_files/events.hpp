@@ -22,6 +22,8 @@ public:
   json j;
 };
 
+
+
 class Research_event: public Event {
 public:
   Research_event(long long int, const std::string&);
@@ -32,6 +34,8 @@ public:
   const std::string technology;
 };
 
+
+
 class Victory_event: public Event {
 public:
   Victory_event(long long int);
@@ -39,6 +43,8 @@ public:
 
   std::string getType() const;
 };
+
+
 
 class Factory_event: public Event {
 public:
@@ -49,6 +55,8 @@ public:
 
   int factory_id = 0;
 };
+
+
 
 class Build_factory_event: public Factory_event {
 public:
@@ -61,6 +69,8 @@ public:
   const std::string factory_name;
 };
 
+
+
 class Destroy_factory_event: public Factory_event {
 public:
   Destroy_factory_event(long long int, int);
@@ -68,6 +78,8 @@ public:
 
   std::string getType() const;
 };
+
+
 
 class Stop_factory_event: public Factory_event {
 public:
@@ -77,6 +89,8 @@ public:
 
   std::string getType() const;
 };
+
+
 
 class Start_factory_event : public Factory_event {
 public:

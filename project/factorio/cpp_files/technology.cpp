@@ -1,4 +1,5 @@
 #include "technology.hpp"
+#include "recipe.hpp"
 
 Technology::Technology(const std::pair<std::string, json>& input, std::unordered_map<std::string, Item*>& items_blueprint, std::unordered_map<std::string, Recipe*>& recipes_blueprint):
   Item(input.first, "technology") {
@@ -12,11 +13,6 @@ Technology::Technology(const std::pair<std::string, json>& input, std::unordered
       ingredients.push_back(std::pair<Item*,int>(items_blueprint[i["name"]], i["amount"]));
     }
 
-    /*std::vector<json> prerequisites_json_vector = input.second["prerequisites"];
-    for (json i : prerequisites_json_vector){
-      prerequisites_string.push_back(i);
-    //prerequisites.push_back(std::pair<Item, int>(items_blueprint[i["name"]], i["amount"]));
-  }*/
 }
 
 Technology::Technology(){}
@@ -26,9 +22,6 @@ bool Technology::operator== (const Technology& other) const{
 }
 
 json& operator<<(json& out, const Technology& technology){
-  //out[technology.name]["category"] = technology.Crafting_category.name;
-  //out[technology.name]["enabled"] = recipe.enabled;
-  //out[technology.name]["energy"] = recipe.energy;
   json effects_json = json::array();
   for (Recipe* effect : technology.effects){
     json effect_json;
@@ -49,9 +42,7 @@ json& operator<<(json& out, const Technology& technology){
 
   json prerequisites_json = json::array();
   for (Technology* prerequisite : technology.prerequisites){
-    //json prerequisite_json;
     prerequisites_json += prerequisite->name;
-    //prerequisites_json += prerequisite_json;
   }
   out[technology.name]["prerequisites"] = prerequisites_json;
   out[technology.name]["researched"] = technology.researched;

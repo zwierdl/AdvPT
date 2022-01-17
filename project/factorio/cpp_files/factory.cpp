@@ -1,4 +1,5 @@
 #include "factory.hpp"
+#include "recipe.hpp"
 
 Factory::Factory(const std::pair<std::string, json>& input):
   Item(input.first, "factory"),
@@ -10,15 +11,9 @@ Factory::Factory(const std::pair<std::string, json>& input):
     }
 }
 
-/*Factory::Factory(std::string name, json input): Item(name, "factory"){   //anstatt "factory" muss type vielleicht "item" sein?!
-  crafting_speed = input["crafting_speed"];
-  std::map <std::string, json> crafting_categories_json_map = input["crafting_categories"];
-  for (std::pair<std::string, json> i : crafting_categories_json_map){
-    crafting_categories.push_back(Crafting_category(i.first));
-  }
-}*/
 
 Factory::Factory(){};
+
 
 Factory::Factory(const std::string& name, int id, const std::string& factory_name, std::unordered_map<std::string, Factory*>& factories_blueprint):
 Item(name, "factory"),
@@ -37,6 +32,7 @@ crafting_categories(factories_blueprint[name]->crafting_categories){
   else if (name == "offshore-pump")                         build_order_index = 9;
 }
 
+
 void Factory::shrink_job(int time_aborted){
   int count_recipe_completed = (time_aborted - time_job_started) / (current_job.recipe.first->energy / crafting_speed);
   int amount_already_produced = current_job.recipe.second * count_recipe_completed;
@@ -52,14 +48,6 @@ json& operator<<(json& out, const Factory& factory){
   for (Crafting_category i : factory.crafting_categories){
     out[factory.name]["crafting_categories"][i.name] = true;
   }
-  /*std::vector<json> crafting_categories_with_bool;
-  json j;
-  for (Crafting_category i : factory.crafting_categories){
-    j[i.name] = true;
-    crafting_categories_with_bool.push_back(j);
-  }
-  out[factory.name]["crafting_categories"] = crafting_categories_with_bool;*/
-  //out[factory.name]["crafting_speed"] = factory.crafting_speed;
   return out;
 }
 

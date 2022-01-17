@@ -13,7 +13,6 @@ using json = nlohmann::json;
 class Factory : public Item {
 public:
   Factory(const std::pair<std::string, json>&);
-  //Factory(std::string, json);
   Factory();
   Factory(const std::string&, int, const std::string&, std::unordered_map<std::string, Factory*>&);
 
