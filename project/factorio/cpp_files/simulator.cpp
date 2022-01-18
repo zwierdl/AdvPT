@@ -309,7 +309,6 @@ void Simulator::optimize(){
   for (int amount = 32; amount >=1; amount /= 2){
     while (progress){
       progress = false;
-      int index = 0;
       for (auto& item_and_insert_iterator : items_and_insert_iterators){
         factories_to_build_in_advance.insert(std::next(item_and_insert_iterator.second, 1), Order(item_and_insert_iterator.first, amount , std::pair<Recipe*, int>(nullptr, 0), nullptr));
         build_items();
@@ -323,6 +322,9 @@ void Simulator::optimize(){
           bestmark = duration;
           std::cerr <<  bestmark << ": " << amount << ": " << item_and_insert_iterator.first->name << std::endl;
           break;
+        }
+        else{
+          factories_to_build_in_advance.erase(std::next(item_and_insert_iterator.second, 1));
         }
       }
     }
