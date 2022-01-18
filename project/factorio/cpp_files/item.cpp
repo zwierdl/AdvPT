@@ -1,3 +1,5 @@
+#include <iomanip>
+
 #include "item.hpp"
 #include "recipe.hpp"
 #include "hash.hpp"

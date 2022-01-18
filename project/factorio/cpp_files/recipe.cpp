@@ -1,6 +1,8 @@
 #include "recipe.hpp"
 #include "technology.hpp"
 
+#include <iomanip>
+
 Recipe::Recipe(const std::pair<std::string, json>& input, std::unordered_map<std::string, Item*>& items_blueprint):
   Item(input.first, "recipe"),
   crafting_category(static_cast<std::string>(input.second["category"])),

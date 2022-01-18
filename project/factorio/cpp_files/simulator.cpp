@@ -1,5 +1,6 @@
 # include "simulator.hpp"
 #include <cmath>
+#include <iomanip>
 //#include <cassert>
 
 Simulator::Simulator(const std::string& challenge){
@@ -124,20 +125,24 @@ Simulator::Simulator(const std::string& challenge){
   factories_to_build_in_advance.push_back(Order(items_blueprint["stone-furnace"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
   factories_to_build_in_advance.push_back(Order(items_blueprint["burner-mining-drill"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
   factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-1"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  items_and_insert_iterators[0] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["stone-furnace"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[0] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-1"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[1] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["burner-mining-drill"], --factories_to_build_in_advance.end());
-  items_and_insert_iterators[2] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-1"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[2] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["stone-furnace"], --factories_to_build_in_advance.end());
 
   factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-2"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
   factories_to_build_in_advance.push_back(Order(items_blueprint["offshore-pump"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
   factories_to_build_in_advance.push_back(Order(items_blueprint["pumpjack"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
   factories_to_build_in_advance.push_back(Order(items_blueprint["oil-refinery"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
   factories_to_build_in_advance.push_back(Order(items_blueprint["chemical-plant"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  items_and_insert_iterators[3] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-2"], --factories_to_build_in_advance.end());
-  items_and_insert_iterators[4] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["offshore-pump"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[3] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["chemical-plant"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[4] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["oil-refinery"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[5] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["pumpjack"], --factories_to_build_in_advance.end());
-  items_and_insert_iterators[6] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["oil-refinery"], --factories_to_build_in_advance.end());
-  items_and_insert_iterators[7] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["chemical-plant"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[6] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["offshore-pump"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[7] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-2"], --factories_to_build_in_advance.end());
+
+
+
+
 
   factories_to_build_in_advance.push_back(Order(items_blueprint["rocket-silo"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
   items_and_insert_iterators[8] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["rocket-silo"], --factories_to_build_in_advance.end());
@@ -300,24 +305,25 @@ void Simulator::optimize(){
   printbuild_order(std::cerr);
   restore_original_state();
 
-  int run = 0;
   bool progress = true;
-  while (run++ < 3 && progress){
-    progress = false;
-    int index = 0;
-    for (auto& item_and_insert_iterator : items_and_insert_iterators){
-      factories_to_build_in_advance.insert(std::next(item_and_insert_iterator.second, 1), Order(item_and_insert_iterator.first, 1 , std::pair<Recipe*, int>(nullptr, 0), nullptr));
-      build_items();
-      restore_original_state();
-      sort_Orders_by_factories();
-      int duration = generate_events(false);
-      printbuild_order(std::cerr);
-      restore_original_state();
-      if (duration < bestmark){
-        progress = true;
-        bestmark = duration;
-        std::cerr << bestmark << std::endl;
-        break;
+  for (int amount = 32; amount >=1; amount /= 2){
+    while (progress){
+      progress = false;
+      int index = 0;
+      for (auto& item_and_insert_iterator : items_and_insert_iterators){
+        factories_to_build_in_advance.insert(std::next(item_and_insert_iterator.second, 1), Order(item_and_insert_iterator.first, amount , std::pair<Recipe*, int>(nullptr, 0), nullptr));
+        build_items();
+        restore_original_state();
+        sort_Orders_by_factories();
+        int duration = generate_events(false);
+        printbuild_order(std::cerr);
+        restore_original_state();
+        if (duration < bestmark){
+          progress = true;
+          bestmark = duration;
+          std::cerr <<  bestmark << ": " << amount << ": " << item_and_insert_iterator.first->name << std::endl;
+          break;
+        }
       }
     }
   }
