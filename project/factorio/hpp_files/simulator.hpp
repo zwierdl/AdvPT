@@ -70,5 +70,6 @@ public:
   json output = json::array();
   std::list<Order> factories_to_build_in_advance;
   int time_of_last_research_event = -1;
+  std::unordered_set<Factory*> factories_all_jobs_done;
 
 };

@@ -29,6 +29,7 @@ public:
   int time_job_started = -1;
   bool starved = false;
   bool destroyed = false;
+  bool all_jobs_done = false;
   int build_order_index = -1;
 
 };

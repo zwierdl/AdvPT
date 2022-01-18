@@ -447,9 +447,15 @@ std::cerr << factory << std::endl;
 
 
 void Simulator::find_work(Factory* factory, bool print_to_json){
-  if (factory->build_order_index == -1){
-
+  if (build_order_by_factories[factory->build_order_index].empty()){
+    if (print_to_json){
+      output += Destroy_factory_event(time, factory->id);
+    }
+    factory->all_jobs_done = true;
+    factories_all_jobs_done.insert(factory);
+    return;
   }
+
   if (!build_order_by_factories[0].empty()){
     if((*build_order_by_factories[0].front()).ingredients_still_needed == 0 && time != time_of_last_research_event){
       Order& order = *build_order_by_factories[0].front();
@@ -477,7 +483,8 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
     }
   }
 
-  for (std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[factory->build_order_index].begin(); iterator != build_order_by_factories[factory->build_order_index].end(); ++iterator){
+  //for (std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[factory->build_order_index].begin(); iterator != build_order_by_factories[factory->build_order_index].end(); ++iterator){
+    std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[factory->build_order_index].begin();
     Order& order = **iterator;
     if (order.ingredients_still_needed == 0){
       if (order.item->stock > order.quantity){
@@ -510,7 +517,14 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
                   if (ingredient.first->name == ingredient_factory->name && ingredient_factory != factory && !ingredient_factory->destroyed){
                     ingredient_factory->destroyed = true;
                     int ingredient_factory_id = ingredient_factory->id;
-                    if (ingredient_factory->starved){
+
+                    if (ingredient_factory->all_jobs_done){
+                      factories_all_jobs_done.erase(ingredient_factory);
+                      factories.erase(ingredient_factory_id);
+                    }
+
+
+                    else if (ingredient_factory->starved){
                       for (std::deque<Factory*>::iterator starved_factory = starved_factories.begin(); starved_factory != starved_factories.end(); ++starved_factory){
                         if ((*starved_factory)->id == ingredient_factory->id){
                           starved_factories.erase(starved_factory);
@@ -555,7 +569,7 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
         }
       }
     }
-  }
+  //}
   factory->starved = true;
   starved_factories.push_back(factory);
 }
