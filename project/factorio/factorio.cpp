@@ -25,15 +25,15 @@ int main(int argc, char* argv[]){
   //Factorio_game factorio;
 
   Simulator simulator(challenge);
-  if (challenge == "../factorio-data/challenge-7.json"){
-    simulator.optimize();
-  }
-  else {
+  //if (challenge == "../factorio-data/challenge-7.json"){
+    //simulator.optimize();
+  //}
+  //else {
     simulator.build_items();
     simulator.sort_Orders_by_factories();
     simulator.restore_original_state();
     simulator.generate_events();
-    simulator.printbuild_order(std::cerr);
+    simulator.printbuild_order(std::cout);
     simulator.print_events();
-  }
+  //}
 }

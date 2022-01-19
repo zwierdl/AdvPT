@@ -393,44 +393,62 @@ int Simulator::generate_events(bool print_to_json){
     Factory* factory = i.second;
     find_work(factory, print_to_json);
   }
-
-  while(!future_events.empty()){
-    Stop_factory_event event = future_events.top();
-    future_events.pop();
-    Factory* factory = factories[event.factory_id];
-    if (factories[event.factory_id]->destroyed){
-      factories.erase(event.factory_id);
-      delete factory;
-      continue;
-    }
-    if (factories[event.factory_id]->current_job.purpose != nullptr){
-      --factories[event.factory_id]->current_job.purpose->ingredients_still_needed;
-    }
-    time = event.timestamp;
-    Order current_job = factories[event.factory_id]->current_job;
-    int overshoot = current_job.recipe.second * (time - factory->time_job_started) / (current_job.recipe.first->energy / factory->crafting_speed) - current_job.quantity; //keine ahnung obs hier rundungsfehler gibt
-    current_job.item->stock += overshoot;
-    output += event;
+  while (!build_order.empty()){
+    while(!future_events.empty()){
+      /*if (build_order.front().item->name == "electronic-circuit"){
+        std::cerr << "halt" << std::endl;
+      }*/
+      Stop_factory_event event = future_events.top();
+      future_events.pop();
+      Factory* factory = factories[event.factory_id];
+      if (factories[event.factory_id]->destroyed){
+        factories.erase(event.factory_id);
+        delete factory;
+        continue;
+      }
+      if (factories[event.factory_id]->current_job.purpose != nullptr){
+        --factories[event.factory_id]->current_job.purpose->ingredients_still_needed;
+      }
+      time = event.timestamp;
+      Order current_job = factories[event.factory_id]->current_job;
+      int overshoot = current_job.recipe.second * (time - factory->time_job_started) / (current_job.recipe.first->energy / factory->crafting_speed) - current_job.quantity; //keine ahnung obs hier rundungsfehler gibt
+      current_job.item->stock += overshoot;
+      output += event;
 //std::cout << event << std::endl;
 
-    if (factories[event.factory_id]->current_job.item->type == "factory" && factories[event.factory_id]->current_job.item->name != "electric-furnace"){
-      for (int i = 0; i < factories[event.factory_id]->current_job.quantity; ++i){
-        Factory* new_factory = new Factory(factories[event.factory_id]->current_job.item->name, next_factory_index, "dummy-factory-name", factories_blueprint);
-        //factories.push_back(new_factory);
-        factories[next_factory_index++] = new_factory;
-        output += Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name);
+      if (factories[event.factory_id]->current_job.item->type == "factory" && factories[event.factory_id]->current_job.item->name != "electric-furnace"){
+        for (int i = 0; i < factories[event.factory_id]->current_job.quantity; ++i){
+          Factory* new_factory = new Factory(factories[event.factory_id]->current_job.item->name, next_factory_index, "dummy-factory-name", factories_blueprint);
+          //factories.push_back(new_factory);
+          factories[next_factory_index++] = new_factory;
+          output += Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name);
 //std::cerr << Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name) <<std::endl;
-        find_work(new_factory, print_to_json);
+          find_work(new_factory, print_to_json);
+        }
       }
-    }
 
-    find_work(factories[event.factory_id]);
-    for (int i = 0; i < starved_factories.size(); ++i){
+      find_work(factories[event.factory_id]);
+
+      /*if ((*build_order_by_factories[1].front()).item->name == "electronic-circuit"){
+        std::cerr << "halt" << std::endl;
+      }*/
+
+
+
+      for (int i = 0; i < starved_factories.size(); ++i){
+        starved_factories.front()->starved = false;
+        find_work(starved_factories.front(), print_to_json);
+        starved_factories.pop_front();
+      }
+
+    }
+    for (int i  = 0; i < starved_factories.size(); ++i){
       starved_factories.front()->starved = false;
       find_work(starved_factories.front(), print_to_json);
       starved_factories.pop_front();
     }
   }
+
 
   for (auto& factory_to_destroy : factories){
     if (factory_to_destroy.second->name != "player"){
@@ -438,8 +456,8 @@ int Simulator::generate_events(bool print_to_json){
     }
   }
 
-  output += Victory_event(time+1);
-  return time+1;
+  output += Victory_event(time+2);
+  return time+2;
 /*for (Factory* factory : factories){
 std::cerr << factory << std::endl;
 }*/
@@ -447,12 +465,15 @@ std::cerr << factory << std::endl;
 
 
 void Simulator::find_work(Factory* factory, bool print_to_json){
+  /*if ((*build_order_by_factories[1].front()).item->name == "copper-cable"){
+    std::cerr << "halt" << std::endl;
+  }*/
   if (build_order_by_factories[factory->build_order_index].empty()){
-    if (print_to_json){
-      output += Destroy_factory_event(time, factory->id);
-    }
+
     factory->all_jobs_done = true;
     factories_all_jobs_done.insert(factory);
+
+
     return;
   }
 

@@ -27,6 +27,7 @@ public:
   const int id = -1;
   Order current_job;
   int time_job_started = -1;
+  int birth_time = 0;
   bool starved = false;
   bool destroyed = false;
   bool all_jobs_done = false;
