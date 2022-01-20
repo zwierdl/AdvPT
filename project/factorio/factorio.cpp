@@ -22,6 +22,7 @@ int main(int argc, char* argv[]){
     file >> input;
     challenge = input["challenge"];
   }
+  std::cout << challenge<< std::endl;
   //Factorio_game factorio;
 
   Simulator simulator(challenge);
@@ -35,6 +36,7 @@ int main(int argc, char* argv[]){
     simulator.restore_original_state();
     simulator.generate_events();
     simulator.printbuild_order(std::cout);
-    //simulator.print_events();
+    simulator.print_events();
+    simulator.printbuild_order(std::cout);
   //}
 }
