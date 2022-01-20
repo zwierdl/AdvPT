@@ -51,6 +51,9 @@ Simulator::Simulator(const std::string& challenge){
   myjson.clear();
   in.close();
 
+  --recipes_blueprint["coal-burner"]->products[0].second;
+  recipes_blueprint["coal-burner"]->ingredients.pop_back();
+
   for (auto& i : recipes_blueprint){
     Recipe* recipe = i.second;
     for (auto& product : recipe->products){
@@ -122,18 +125,19 @@ Simulator::Simulator(const std::string& challenge){
     goal.push_back(std::pair<Item*, int>(items_blueprint[(*i)["name"]], (*i)["amount"]));
   }
 
-  factories_to_build_in_advance.push_back(Order(items_blueprint["stone-furnace"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  factories_to_build_in_advance.push_back(Order(items_blueprint["burner-mining-drill"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-1"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["stone-furnace"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["burner-mining-drill"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
+  /*
+  factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-1"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
   items_and_insert_iterators[0] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-1"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[1] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["burner-mining-drill"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[2] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["stone-furnace"], --factories_to_build_in_advance.end());
 
-  factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-2"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  factories_to_build_in_advance.push_back(Order(items_blueprint["offshore-pump"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  factories_to_build_in_advance.push_back(Order(items_blueprint["pumpjack"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  factories_to_build_in_advance.push_back(Order(items_blueprint["oil-refinery"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
-  factories_to_build_in_advance.push_back(Order(items_blueprint["chemical-plant"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-2"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["offshore-pump"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["pumpjack"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["oil-refinery"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["chemical-plant"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
   items_and_insert_iterators[3] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["chemical-plant"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[4] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["oil-refinery"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[5] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["pumpjack"], --factories_to_build_in_advance.end());
@@ -144,8 +148,9 @@ Simulator::Simulator(const std::string& challenge){
 
 
 
-  factories_to_build_in_advance.push_back(Order(items_blueprint["rocket-silo"], 1, std::pair<Recipe*, int>(nullptr,0), nullptr));
+  factories_to_build_in_advance.push_back(Order(items_blueprint["rocket-silo"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
   items_and_insert_iterators[8] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["rocket-silo"], --factories_to_build_in_advance.end());
+  */
 }
 
 
@@ -180,7 +185,7 @@ void Simulator::build_items(){
     Item* item_p = i.first;
     int ordered_amount = i.second;
     std::list<Order>::iterator iterator = build_order.end();
-    process_order(Order(item_p, ordered_amount, std::pair<Recipe*, int>(nullptr, 0), nullptr), build_order, iterator);
+    process_order(Order(item_p, ordered_amount, std::pair<Recipe*, int>(nullptr, 0), build_order.end()), build_order, iterator);
 //std::cout << *i.first << std::endl;
   }
 }
@@ -203,12 +208,15 @@ void Simulator::process_order(Order order, std::list<Order>& list, std::list<Ord
     }
     list.insert(iterator, Order(item_p, amount_ordered, recipe_p, order.purpose));
     --iterator;
-    Order* purpose = &(*iterator);
+    std::list<Order>::iterator purpose = iterator;
     int amount_produced = recipe_p.second;
     for (auto& ingredient : recipe_p.first->ingredients){
       Item* item_ingredient_p = ingredient.first;
       int amount_consumed = ingredient.second;
       process_order(Order(item_ingredient_p, std::ceil(amount_ordered/amount_produced)  * amount_consumed + 1, std::pair<Recipe*, int>(nullptr,0), purpose), list, iterator);
+    }
+    if (item_p->name == "coal-burner"){
+      process_order(Order(items_blueprint["coal"], amount_ordered, std::pair<Recipe*, int>(nullptr, 0), purpose), list, iterator);
     }
     if (item_p->type == "factory"){
       bool new_category = false;
@@ -254,9 +262,9 @@ void Simulator::research_Technology(Technology* technology_p, std::list<Order>& 
   }
 //std::cerr << technology_p->name << std::endl;
 //printItems(std::cerr);
-  list.insert(iterator, Order(technology_p, 1, std::pair<Recipe*, int>(nullptr, 0), nullptr));
+  list.insert(iterator, Order(technology_p, 1, std::pair<Recipe*, int>(nullptr, 0), build_order.end()));
   --iterator;
-  Order* purpose = &(*iterator);
+  std::list<Order>::iterator purpose = iterator;
   for (auto& i : technology_p->ingredients){
     process_order(Order(i.first, i.second, std::pair<Recipe*, int>(nullptr,0), purpose), list, iterator);
   }
@@ -279,7 +287,7 @@ void Simulator::sort_Orders_by_factories(){
       if ((*pos).item->type == "technology"){
                                                       build_order_by_factories[0].push_back(pos);
       }
-      else{
+      else if ((*pos).ingredients_still_needed == 0){
         const std::string& category = (*pos).recipe.first->crafting_category.name;
         if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
                                                       build_order_by_factories[1].push_back(pos);
@@ -310,7 +318,7 @@ void Simulator::optimize(){
     while (progress){
       progress = false;
       for (auto& item_and_insert_iterator : items_and_insert_iterators){
-        factories_to_build_in_advance.insert(std::next(item_and_insert_iterator.second, 1), Order(item_and_insert_iterator.first, amount , std::pair<Recipe*, int>(nullptr, 0), nullptr));
+        factories_to_build_in_advance.insert(std::next(item_and_insert_iterator.second, 1), Order(item_and_insert_iterator.first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end()));
         build_items();
         restore_original_state();
         sort_Orders_by_factories();
@@ -398,7 +406,9 @@ int Simulator::generate_events(bool print_to_json){
       /*if (build_order.front().item->name == "electronic-circuit"){
         std::cerr << "halt" << std::endl;
       }*/
+
       Stop_factory_event event = future_events.top();
+      std::cout << std::setw(2) << event << std::endl;
       future_events.pop();
       Factory* factory = factories[event.factory_id];
       if (factories[event.factory_id]->destroyed){
@@ -406,8 +416,22 @@ int Simulator::generate_events(bool print_to_json){
         delete factory;
         continue;
       }
-      if (factories[event.factory_id]->current_job.purpose != nullptr){
-        --factories[event.factory_id]->current_job.purpose->ingredients_still_needed;
+      if (factories[event.factory_id]->current_job.purpose != build_order.end()){
+        std::list<Order>::iterator& purpose = factories[event.factory_id]->current_job.purpose;
+        --(*purpose).ingredients_still_needed;
+        if ((*purpose).ingredients_still_needed == 0){
+          const std::string& category = (*purpose).recipe.first->crafting_category.name;
+          if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
+                                                        build_order_by_factories[1].push_back(purpose);
+          else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(purpose);
+          else if (category == "oil-processing")        build_order_by_factories[3].push_back(purpose);
+          else if (category == "chemistry")             build_order_by_factories[4].push_back(purpose);
+          else if (category == "rocket-building")       build_order_by_factories[5].push_back(purpose);
+          else if (category == "basic-smelting")        build_order_by_factories[6].push_back(purpose);
+          else if (category == "burner-solid")          build_order_by_factories[7].push_back(purpose);
+          else if (category == "basic-fluid")           build_order_by_factories[8].push_back(purpose);
+          else if (category == "water-pump")            build_order_by_factories[9].push_back(purpose);
+        }
       }
       time = event.timestamp;
       Order current_job = factories[event.factory_id]->current_job;
@@ -461,6 +485,8 @@ int Simulator::generate_events(bool print_to_json){
 /*for (Factory* factory : factories){
 std::cerr << factory << std::endl;
 }*/
+
+
 }
 
 
@@ -468,6 +494,7 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
   /*if ((*build_order_by_factories[1].front()).item->name == "copper-cable"){
     std::cerr << "halt" << std::endl;
   }*/
+
   if (build_order_by_factories[factory->build_order_index].empty()){
 
     factory->all_jobs_done = true;
@@ -483,6 +510,7 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
       if (print_to_json){
         output += Research_event(time, order.item->name);
       }
+      std::cout << std::setw(2) << Research_event(time, order.item->name) << std::endl;
       Technology* technology = static_cast<Technology*>(order.item);
       technology->researched = true;
       for (Recipe* effect : technology->effects){
@@ -493,6 +521,20 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
         for (Technology* prerequisite : advanced_technology->prerequisites){
           if (prerequisite->name == technology->name){
             --((**iterator).ingredients_still_needed);
+            if ((**iterator).ingredients_still_needed == 0){
+              const std::string& category = (**iterator).recipe.first->crafting_category.name;
+              if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
+                                                            build_order_by_factories[1].push_back(*iterator);
+              else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(*iterator);
+              else if (category == "oil-processing")        build_order_by_factories[3].push_back(*iterator);
+              else if (category == "chemistry")             build_order_by_factories[4].push_back(*iterator);
+              else if (category == "rocket-building")       build_order_by_factories[5].push_back(*iterator);
+              else if (category == "basic-smelting")        build_order_by_factories[6].push_back(*iterator);
+              else if (category == "burner-solid")          build_order_by_factories[7].push_back(*iterator);
+              else if (category == "basic-fluid")           build_order_by_factories[8].push_back(*iterator);
+              else if (category == "water-pump")            build_order_by_factories[9].push_back(*iterator);
+
+            }
           }
         }
       }
@@ -509,8 +551,8 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
     Order& order = **iterator;
     if (order.ingredients_still_needed == 0){
       if (order.item->stock > order.quantity){
-        if (order.purpose != nullptr){
-          --(order.purpose->ingredients_still_needed);
+        if (order.purpose != build_order.end()){
+          --((*order.purpose).ingredients_still_needed);
         }
         order.item->stock -= order.quantity;
         build_order.erase(*iterator);
@@ -562,11 +604,13 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
                       if (print_to_json){
                         output += Stop_factory_event(time, ingredient_factory->id);
                       }
+                      std::cout << std::setw(2) << Stop_factory_event(time, ingredient_factory->id) << std::endl;
 //std::cerr << Stop_factory_event(time, ingredient_factory->id) << std::endl;
                     }
                     if (print_to_json){
                       output += Destroy_factory_event(time, ingredient_factory_id);//hier muss noch die Factory aus dem Vector geloescht werden und deleted werden
                     }
+                    std::cout << std::setw(2) << Destroy_factory_event(time, ingredient_factory_id);
 //std::cerr << Destroy_factory_event(time, ingredient_factory->id) << std::endl;
                     break;
 
@@ -581,6 +625,7 @@ void Simulator::find_work(Factory* factory, bool print_to_json){
           if (print_to_json){
             output += Start_factory_event(time, factory->id, order.recipe.first->name);
           }
+          std::cout << std::setw(2) << Start_factory_event(time, factory->id, order.recipe.first->name) << std::endl;
 //std::cerr << Start_factory_event(time, factory_p->id, order.recipe->name) << std::endl;
           int time_finished = time + static_cast<int>(std::ceil(order.quantity/order.recipe.second)  * std::ceil(order.recipe.first->energy / factory->crafting_speed)) +2;  //nochmal drueber nachdenken!
           future_events.push(Stop_factory_event(time_finished, factory->id));

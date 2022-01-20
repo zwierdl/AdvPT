@@ -31,9 +31,10 @@ int main(int argc, char* argv[]){
   //else {
     simulator.build_items();
     simulator.sort_Orders_by_factories();
+    //simulator.printbuild_order(std::cout);
     simulator.restore_original_state();
     simulator.generate_events();
     simulator.printbuild_order(std::cout);
-    simulator.print_events();
+    //simulator.print_events();
   //}
 }

@@ -8,7 +8,7 @@ item(item),
 quantity(quantity),
 recipe(recipe){}
 
-Order::Order(Item* item, double quantity, std::pair<Recipe*, int> recipe, Order* purpose):
+Order::Order(Item* item, double quantity, std::pair<Recipe*, int> recipe, std::list<Order>::iterator purpose):
 item(item),
 quantity(quantity),
 recipe(recipe),
