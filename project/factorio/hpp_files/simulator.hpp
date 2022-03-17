@@ -40,7 +40,7 @@ public:
 
   void restore_original_state();
 
-  void find_work(Factory*, bool print_to_json = true);
+  bool find_work(Factory*, bool print_to_json = true);
   int generate_events(bool print_to_json = true);
   void print_events();
 

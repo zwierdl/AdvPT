@@ -8,14 +8,15 @@ item(item),
 quantity(quantity),
 recipe(recipe){}
 
-Order::Order(Item* item, double quantity, std::pair<Recipe*, int> recipe, std::list<Order>::iterator purpose):
+Order::Order(Item* item, double quantity, std::pair<Recipe*, int> recipe, std::list<Order>::iterator purpose, bool establish_factory):
 item(item),
 quantity(quantity),
 recipe(recipe),
-purpose(purpose){
+purpose(purpose),
+establish_factory(establish_factory){
   if (typeid(item) == typeid(Item*)){
     if (recipe.first != nullptr){
-      ingredients_still_needed = recipe.first->ingredients.size();
+      ingredients_still_needed = recipe.first->ingredients.size() + (!recipe.first->enabled_at_begin);
     }
   }
   if (item->type == "technology"){

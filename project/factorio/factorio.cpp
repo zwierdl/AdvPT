@@ -17,26 +17,28 @@ int main(int argc, char* argv[]){
     challenge = argv[1];
   }
   else{
-    std::fstream file("../factorio-data/input.json");
+    std::fstream file("./factorio-data/input.json");
     json input;
     file >> input;
     challenge = input["challenge"];
   }
-  std::cout << challenge<< std::endl;
+  //std::cout << challenge<< std::endl;
   //Factorio_game factorio;
 
   Simulator simulator(challenge);
-  //if (challenge == "../factorio-data/challenge-7.json"){
-    //simulator.optimize();
-  //}
-  //else {
-    simulator.build_items();
-    simulator.sort_Orders_by_factories();
-    //simulator.printbuild_order(std::cout);
-    simulator.restore_original_state();
-    simulator.generate_events();
-    simulator.printbuild_order(std::cout);
-    simulator.print_events();
-    simulator.printbuild_order(std::cout);
-  //}
+  simulator.optimize();
+  /*if (challenge == "./factorio-data/challenge-7.json"){
+    simulator.optimize();
+  }*/
+/*
+  simulator.build_items();
+  simulator.sort_Orders_by_factories();
+  //simulator.printbuild_order(std::cerr);
+  //simulator.printbuild_order(std::cout);
+  simulator.restore_original_state();
+  //simulator.printbuild_order(std::cout);
+  simulator.generate_events();
+  simulator.print_events();
+  simulator.printbuild_order(std::cerr);
+*/
 }
