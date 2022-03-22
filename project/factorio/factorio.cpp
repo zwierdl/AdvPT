@@ -27,11 +27,9 @@ int main(int argc, char* argv[]){
 
   Simulator simulator(challenge);
   simulator.optimize();
-  /*if (challenge == "./factorio-data/challenge-7.json"){
-    simulator.optimize();
-  }*/
 /*
   simulator.build_items();
+  simulator.set_Indices();
   simulator.sort_Orders_by_factories();
   //simulator.printbuild_order(std::cerr);
   //simulator.printbuild_order(std::cout);

@@ -21,4 +21,5 @@ public:
   std::list<Order>::iterator purpose;
   //Order* purpose = nullptr;
   bool establish_factory = false;
+  int index = -1;
 };

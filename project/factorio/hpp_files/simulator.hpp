@@ -36,6 +36,7 @@ public:
   void build_items();
   void research_Technology(Technology*, std::list<Order>&, std::list<Order>::iterator);
   void unlock_missing_ingredient(Item*, std::list<Order>&, std::list<Order>::iterator);
+  void set_Indices();
   void sort_Orders_by_factories();
 
   void restore_original_state();
@@ -62,7 +63,8 @@ public:
   int next_factory_index = 0;
   std::vector<std::pair<Item*, int>> goal;
   std::list<Order> build_order;
-  std::vector<std::list<std::list<Order>::iterator>> build_order_by_factories = std::vector<std::list<std::list<Order>::iterator>>(10);
+  //std::vector<std::list<std::list<Order>::iterator>> build_order_by_factories = std::vector<std::list<std::list<Order>::iterator>>(10);
+  std::vector<std::priority_queue<std::list<Order>::iterator, std::vector<std::list<Order>::iterator>, MyCompare>> build_order_by_factories = std::vector<std::priority_queue<std::list<Order>::iterator, std::vector<std::list<Order>::iterator>, MyCompare>>(10);
   std::vector<std::pair<Item*, std::list<Order>::iterator>> items_and_insert_iterators = std::vector<std::pair<Item*, std::list<Order>::iterator>>(9);
   std::deque<Factory*> starved_factories;
   std::priority_queue<Stop_factory_event, std::vector<Stop_factory_event>, std::greater<Stop_factory_event>> future_events;

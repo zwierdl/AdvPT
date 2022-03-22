@@ -305,26 +305,34 @@ void Simulator::research_Technology(Technology* technology_p, std::list<Order>& 
 
 }
 
+void Simulator::set_Indices(){
+  int next_index = 0;
+  for (std::list<Order>::iterator iterator = build_order.begin(); iterator != build_order.end(); ++iterator){
+    (*iterator).index = next_index++;
+  }
+}
+
 
 void Simulator::sort_Orders_by_factories(){
 
     for (std::list<Order>::iterator pos = build_order.begin(); pos != build_order.end(); ++pos){
 
-      if ((*pos).item->type == "technology"){
-                                                      build_order_by_factories[0].push_back(pos);
+      /*if ((*pos).item->type == "technology"){
+                                                      build_order_by_factories[0].push(pos);
       }
-      else if ((*pos).ingredients_still_needed == 0){
+      else if ((*pos).ingredients_still_needed == 0){*/
+      if ((*pos).ingredients_still_needed == 0){
         const std::string& category = (*pos).recipe.first->crafting_category.name;
         if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
-                                                      build_order_by_factories[1].push_back(pos);
-        else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(pos);
-        else if (category == "oil-processing")        build_order_by_factories[3].push_back(pos);
-        else if (category == "chemistry")             build_order_by_factories[4].push_back(pos);
-        else if (category == "rocket-building")       build_order_by_factories[5].push_back(pos);
-        else if (category == "basic-smelting")        build_order_by_factories[6].push_back(pos);
-        else if (category == "burner-solid")          build_order_by_factories[7].push_back(pos);
-        else if (category == "basic-fluid")           build_order_by_factories[8].push_back(pos);
-        else if (category == "water-pump")            build_order_by_factories[9].push_back(pos);
+                                                      build_order_by_factories[1].push(pos);
+        else if (category == "crafting-with-fluid")   build_order_by_factories[2].push(pos);
+        else if (category == "oil-processing")        build_order_by_factories[3].push(pos);
+        else if (category == "chemistry")             build_order_by_factories[4].push(pos);
+        else if (category == "rocket-building")       build_order_by_factories[5].push(pos);
+        else if (category == "basic-smelting")        build_order_by_factories[6].push(pos);
+        else if (category == "burner-solid")          build_order_by_factories[7].push(pos);
+        else if (category == "basic-fluid")           build_order_by_factories[8].push(pos);
+        else if (category == "water-pump")            build_order_by_factories[9].push(pos);
       }
     }
 
@@ -333,6 +341,7 @@ void Simulator::sort_Orders_by_factories(){
 
 void Simulator::optimize(){
   build_items();
+  set_Indices();
   restore_original_state();
   sort_Orders_by_factories();
   int bestmark = generate_events(false);
@@ -343,9 +352,9 @@ void Simulator::optimize(){
   std::chrono::time_point<std::chrono::steady_clock> right_now;
   std::chrono::duration<double> time_elapsed;
   bool progress = true;
-  for (int amount = 4; amount >=1 && time_elapsed.count() < 500; amount /= 2){
-    std::cerr << "amount: " << amount << std::endl;
-    std::cerr << "time: " << time_elapsed.count() << std::endl;
+  for (int amount = 4; amount >=1 && time_elapsed.count() < 60; amount /= 2){
+    //std::cerr << "amount: " << amount << std::endl;
+    //std::cerr << "time: " << time_elapsed.count() << std::endl;
     progress = true;
     while(progress){
       //progress = false;
@@ -354,10 +363,11 @@ void Simulator::optimize(){
         for (auto& item_and_insert_iterator : items_and_insert_iterators){
           factories_to_build_in_advance.insert(std::next(item_and_insert_iterator.second, 1), Order(item_and_insert_iterator.first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
           build_items();
+          set_Indices();
           restore_original_state();
           sort_Orders_by_factories();
           int duration = generate_events(false);
-          //printbuild_order(std::cerr);
+          printbuild_order(std::cerr);
           restore_original_state();
           /*if (amount <= 4){
             std::cerr << "duration now: " << duration << ": " << amount << ":"  << item_and_insert_iterator.first->name << std::endl;
@@ -365,7 +375,7 @@ void Simulator::optimize(){
           if (duration < bestmark){
             progress = true;
             bestmark = duration;
-            std::cerr <<  bestmark << ": " << amount << ": " << item_and_insert_iterator.first->name << std::endl;
+            //std::cerr <<  bestmark << ": " << amount << ": " << item_and_insert_iterator.first->name << std::endl;
             break;
           }
           else{
@@ -384,6 +394,7 @@ void Simulator::optimize(){
       factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[7].second, 1), Order(items_and_insert_iterators[7].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
 
       build_items();
+      set_Indices();
       restore_original_state();
       sort_Orders_by_factories();
       int duration = generate_events(false);
@@ -393,7 +404,7 @@ void Simulator::optimize(){
       if (duration < bestmark){
         progress = true;
         bestmark = duration;
-        std::cerr <<  bestmark << ": " << amount << ": " << "alles" << std::endl;
+        //std::cerr <<  bestmark << ": " << amount << ": " << "alles" << std::endl;
       }
       else{
         factories_to_build_in_advance.erase(std::next(items_and_insert_iterators[7].second, 1));
@@ -411,6 +422,7 @@ void Simulator::optimize(){
     time_elapsed = right_now - begin;
   }
   build_items();
+  set_Indices();
   restore_original_state();
   sort_Orders_by_factories();
   generate_events();
@@ -494,20 +506,20 @@ int Simulator::generate_events(bool print_to_json){
         --(*purpose).ingredients_still_needed;
         if ((*purpose).ingredients_still_needed == 0){
           if ((*purpose).item->type == "technology"){
-            //build_order_by_factories[0].push_back(purpose);
+            build_order_by_factories[0].push(purpose);
           }
           else{
             const std::string& category = (*purpose).recipe.first->crafting_category.name;
             if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
-                                                        build_order_by_factories[1].push_back(purpose);
-            else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(purpose);
-            else if (category == "oil-processing")        build_order_by_factories[3].push_back(purpose);
-            else if (category == "chemistry")             build_order_by_factories[4].push_back(purpose);
-            else if (category == "rocket-building")       build_order_by_factories[5].push_back(purpose);
-            else if (category == "basic-smelting")        build_order_by_factories[6].push_back(purpose);
-            else if (category == "burner-solid")          build_order_by_factories[7].push_back(purpose);
-            else if (category == "basic-fluid")           build_order_by_factories[8].push_back(purpose);
-            else if (category == "water-pump")            build_order_by_factories[9].push_back(purpose);
+                                                        build_order_by_factories[1].push(purpose);
+            else if (category == "crafting-with-fluid")   build_order_by_factories[2].push(purpose);
+            else if (category == "oil-processing")        build_order_by_factories[3].push(purpose);
+            else if (category == "chemistry")             build_order_by_factories[4].push(purpose);
+            else if (category == "rocket-building")       build_order_by_factories[5].push(purpose);
+            else if (category == "basic-smelting")        build_order_by_factories[6].push(purpose);
+            else if (category == "burner-solid")          build_order_by_factories[7].push(purpose);
+            else if (category == "basic-fluid")           build_order_by_factories[8].push(purpose);
+            else if (category == "water-pump")            build_order_by_factories[9].push(purpose);
           }
           //build_order.erase(purpose);
         }
@@ -590,8 +602,8 @@ bool Simulator::find_work(Factory* factory, bool print_to_json){
   }*/
 
   if (!build_order_by_factories[0].empty()){
-    if((*build_order_by_factories[0].front()).ingredients_still_needed == 0 && time != time_of_last_research_event){
-      Order& order = *build_order_by_factories[0].front();
+    if((*build_order_by_factories[0].top()).ingredients_still_needed == 0 && time != time_of_last_research_event){
+      Order& order = *build_order_by_factories[0].top();
       if (print_to_json){
         output += Research_event(time, order.item->name);
       }
@@ -601,60 +613,52 @@ bool Simulator::find_work(Factory* factory, bool print_to_json){
       for (Recipe* effect : technology->effects){
         effect->enabled = true;
       }
-      for (std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[0].begin(); iterator != build_order_by_factories[0].end(); ++iterator){
+      /*for (std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[0].begin(); iterator != build_order_by_factories[0].end(); ++iterator){
         Technology* advanced_technology = static_cast<Technology*>((**iterator).item);
         for (Technology* prerequisite : advanced_technology->prerequisites){
           if (prerequisite->name == technology->name){
             --((**iterator).ingredients_still_needed);
-            /*if ((**iterator).ingredients_still_needed == 0){
-              if ((**iterator).item->type == "technology"){
-                build_order_by_factories[0].push_back(*iterator)
-                //build_order_by_factories[0].push_back(*iterator);
-              }
-              else{
-                const std::string& category = (**iterator).recipe.first->crafting_category.name;
-                if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
-                                                            build_order_by_factories[1].push_back(*iterator);
-                else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(*iterator);
-                else if (category == "oil-processing")        build_order_by_factories[3].push_back(*iterator);
-                else if (category == "chemistry")             build_order_by_factories[4].push_back(*iterator);
-                else if (category == "rocket-building")       build_order_by_factories[5].push_back(*iterator);
-                else if (category == "basic-smelting")        build_order_by_factories[6].push_back(*iterator);
-                else if (category == "burner-solid")          build_order_by_factories[7].push_back(*iterator);
-                else if (category == "basic-fluid")           build_order_by_factories[8].push_back(*iterator);
-                else if (category == "water-pump")            build_order_by_factories[9].push_back(*iterator);
-              }
-            }*/
 
           }
         }
-      }
+      }*/
       for (std::list<Order>::iterator iterator = build_order.begin(); iterator != build_order.end(); ++iterator){
         Order& advanced_order= *iterator;
-        if (advanced_order.ingredients_still_needed != 0 && advanced_order.recipe.first != nullptr){
+        if (advanced_order.ingredients_still_needed != 0 && advanced_order.item->type != "technology"){
           for (Recipe* effect : technology->effects){
             if (advanced_order.recipe.first == effect){
               --advanced_order.ingredients_still_needed;
+
+              if (advanced_order.ingredients_still_needed == 0){
+                const std::string& category = advanced_order.recipe.first->crafting_category.name;
+                if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
+                                                              build_order_by_factories[1].push(iterator);
+                else if (category == "crafting-with-fluid")   build_order_by_factories[2].push(iterator);
+                else if (category == "oil-processing")        build_order_by_factories[3].push(iterator);
+                else if (category == "chemistry")             build_order_by_factories[4].push(iterator);
+                else if (category == "rocket-building")       build_order_by_factories[5].push(iterator);
+                else if (category == "basic-smelting")        build_order_by_factories[6].push(iterator);
+                else if (category == "burner-solid")          build_order_by_factories[7].push(iterator);
+                else if (category == "basic-fluid")           build_order_by_factories[8].push(iterator);
+                else if (category == "water-pump")            build_order_by_factories[9].push(iterator);
+              }
             }
-            if (advanced_order.ingredients_still_needed == 0){
-              const std::string& category = advanced_order.recipe.first->crafting_category.name;
-              if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
-                                                            build_order_by_factories[1].push_back(iterator);
-              else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(iterator);
-              else if (category == "oil-processing")        build_order_by_factories[3].push_back(iterator);
-              else if (category == "chemistry")             build_order_by_factories[4].push_back(iterator);
-              else if (category == "rocket-building")       build_order_by_factories[5].push_back(iterator);
-              else if (category == "basic-smelting")        build_order_by_factories[6].push_back(iterator);
-              else if (category == "burner-solid")          build_order_by_factories[7].push_back(iterator);
-              else if (category == "basic-fluid")           build_order_by_factories[8].push_back(iterator);
-              else if (category == "water-pump")            build_order_by_factories[9].push_back(iterator);
+          }
+        }
+        else if(advanced_order.item->type == "technology"){
+          Technology* advanced_technology = static_cast<Technology*>(advanced_order.item);
+          for (Technology* prerequisite : advanced_technology->prerequisites){
+            if (prerequisite->name == technology->name){
+              --(advanced_order.ingredients_still_needed);
+              if (advanced_order.ingredients_still_needed == 0){
+                build_order_by_factories[0].push(iterator);
+              }
             }
           }
         }
       }
-
-      build_order.erase(build_order_by_factories[0].front());
-      build_order_by_factories[0].pop_front();
+      build_order.erase(build_order_by_factories[0].top());
+      build_order_by_factories[0].pop();
       time_of_last_research_event = time;
       find_work(factory);
       return true;
@@ -663,9 +667,12 @@ bool Simulator::find_work(Factory* factory, bool print_to_json){
 
   //for (std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[factory->build_order_index].begin(); iterator != build_order_by_factories[factory->build_order_index].end(); ++iterator){
 
-  std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[factory->build_order_index].begin();
-  if (iterator != build_order_by_factories[factory->build_order_index].end()){
-    Order& order = **iterator;
+
+  if (!build_order_by_factories[factory->build_order_index].empty()){
+    std::list<Order>::iterator iterator = build_order_by_factories[factory->build_order_index].top();
+  //std::list<std::list<Order>::iterator>::iterator iterator = build_order_by_factories[factory->build_order_index].begin();
+  //if (iterator != build_order_by_factories[factory->build_order_index].end()){
+    Order& order = *iterator;
     if (order.ingredients_still_needed == 0){
       if (order.item->stock > order.quantity){
         if (order.purpose != build_order.end()){
@@ -673,20 +680,20 @@ bool Simulator::find_work(Factory* factory, bool print_to_json){
         }
         if ((*order.purpose).ingredients_still_needed == 0){
           if ((*order.purpose).item->type == "technology"){
-            //build_order_by_factories[0].push_back(*iterator);
+            build_order_by_factories[0].push(order.purpose);
           }
           else{
             const std::string& category = (*order.purpose).recipe.first->crafting_category.name;
             if (category == "wood-crafting" || category == "basic-solid" || category == "crafting" || category == "basic-crafting" || category == "advanced-crafting")
-                                                      build_order_by_factories[1].push_back(order.purpose);
-            else if (category == "crafting-with-fluid")   build_order_by_factories[2].push_back(order.purpose);
-            else if (category == "oil-processing")        build_order_by_factories[3].push_back(order.purpose);
-            else if (category == "chemistry")             build_order_by_factories[4].push_back(order.purpose);
-            else if (category == "rocket-building")       build_order_by_factories[5].push_back(order.purpose);
-            else if (category == "basic-smelting")        build_order_by_factories[6].push_back(order.purpose);
-            else if (category == "burner-solid")          build_order_by_factories[7].push_back(order.purpose);
-            else if (category == "basic-fluid")           build_order_by_factories[8].push_back(order.purpose);
-            else if (category == "water-pump")            build_order_by_factories[9].push_back(order.purpose);
+                                                      build_order_by_factories[1].push(order.purpose);
+            else if (category == "crafting-with-fluid")   build_order_by_factories[2].push(order.purpose);
+            else if (category == "oil-processing")        build_order_by_factories[3].push(order.purpose);
+            else if (category == "chemistry")             build_order_by_factories[4].push(order.purpose);
+            else if (category == "rocket-building")       build_order_by_factories[5].push(order.purpose);
+            else if (category == "basic-smelting")        build_order_by_factories[6].push(order.purpose);
+            else if (category == "burner-solid")          build_order_by_factories[7].push(order.purpose);
+            else if (category == "basic-fluid")           build_order_by_factories[8].push(order.purpose);
+            else if (category == "water-pump")            build_order_by_factories[9].push(order.purpose);
           }
         }
 
@@ -695,12 +702,12 @@ bool Simulator::find_work(Factory* factory, bool print_to_json){
 
 
         order.item->stock -= order.quantity;
-        build_order.erase(*iterator);
-        build_order_by_factories[factory->build_order_index].erase(iterator);
+        build_order.erase(iterator);
+        build_order_by_factories[factory->build_order_index].pop();
         find_work(factory);
         return true; // das ist ein fehler !!!! eigentlich return find_work(factory);
 
-      }
+      }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       if (order.recipe.first->enabled){
         bool recipe_can_be_executed = false;
         for (Crafting_category& category : factory->crafting_categories){
@@ -769,8 +776,8 @@ bool Simulator::find_work(Factory* factory, bool print_to_json){
 //std::cerr << Start_factory_event(time, factory_p->id, order.recipe->name) << std::endl;
           int time_finished = time + static_cast<int>((std::ceil(order.quantity/order.recipe.second))  * (std::ceil(order.recipe.first->energy / factory->crafting_speed)));  //nochmal drueber nachdenken!
           future_events.push(Stop_factory_event(time_finished, factory->id));
-          build_order.erase(*iterator);
-          build_order_by_factories[factory->build_order_index].erase(iterator);
+          build_order.erase(iterator);
+          build_order_by_factories[factory->build_order_index].pop();
           return true;
         }
       }
