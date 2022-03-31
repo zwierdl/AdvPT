@@ -29,7 +29,7 @@ using json = nlohmann::json;
 class Simulator {
 public:
 
-  Simulator(const std::string&);
+  Simulator(const std::string&, int);
   ~Simulator() noexcept;
 
   void process_order(Order, std::list<Order>&, std::list<Order>::iterator&);
@@ -52,6 +52,7 @@ public:
   void optimize();
 
 
+  const int first_amount;
   std::unordered_map<std::string, Item*> items_blueprint;
   std::unordered_map<std::string, Factory*> factories_blueprint;
   std::unordered_map<std::string, Recipe*> recipes_blueprint;
@@ -73,5 +74,6 @@ public:
   std::list<Order> factories_to_build_in_advance;
   int time_of_last_research_event = -1;
   std::unordered_set<Factory*> factories_all_jobs_done;
+  std::vector<std::vector<std::pair<Item*, std::list<Order>::iterator>>> power_set;
 
 };

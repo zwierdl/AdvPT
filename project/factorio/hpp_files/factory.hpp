@@ -7,6 +7,7 @@
 #include "crafting_category.hpp"
 #include "item.hpp"
 #include "order.hpp"
+#include "recipe.hpp"
 
 using json = nlohmann::json;
 

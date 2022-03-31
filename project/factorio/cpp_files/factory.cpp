@@ -23,15 +23,15 @@ id(id),
 factory_name(factory_name),
 crafting_speed(factories_blueprint[name]->crafting_speed),
 crafting_categories(factories_blueprint[name]->crafting_categories){
-  if (name == "assembling-machine-1" || name == "player")   build_order_index = 1;
-  else if (name == "assembling-machine-2")                  build_order_index = 2;
-  else if (name == "oil-refinery")                          build_order_index = 3;
-  else if (name == "chemical-plant")                        build_order_index = 4;
-  else if (name == "rocket-silo")                           build_order_index = 5;
-  else if (name == "stone-furnace")                         build_order_index = 6;
-  else if (name == "burner-mining-drill")                   build_order_index = 7;
-  else if (name == "pumpjack")                              build_order_index = 8;
-  else if (name == "offshore-pump")                         build_order_index = 9;
+  if (name == "assembling-machine-1" || name == "player")   {build_order_index = 1;}
+  else if (name == "assembling-machine-2")                  {build_order_index = 2;}
+  else if (name == "oil-refinery")                          {build_order_index = 3;}
+  else if (name == "chemical-plant")                        {build_order_index = 4;}
+  else if (name == "rocket-silo")                           {build_order_index = 5;}
+  else if (name == "stone-furnace")                         {build_order_index = 6;}
+  else if (name == "burner-mining-drill")                   {build_order_index = 7;}
+  else if (name == "pumpjack")                              {build_order_index = 8;}
+  else if (name == "offshore-pump")                         {build_order_index = 9;}
 }
 
 

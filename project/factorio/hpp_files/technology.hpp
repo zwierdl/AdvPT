@@ -3,10 +3,11 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <recipe.hpp>
 
 #include "item.hpp"
 
-class Recipe;
+//class Recipe;
 
 
 class Technology: public Item{

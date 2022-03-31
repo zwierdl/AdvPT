@@ -11,21 +11,23 @@
 
 
 int main(int argc, char* argv[]){
-  std::string challenge;
+  std::fstream file("./factorio-data/input.json");
+  json input;
+  file >> input;
+  int first_amount = input["first_amount"];
 
+  std::string challenge;
   if (argc >= 2){
     challenge = argv[1];
   }
   else{
-    std::fstream file("./factorio-data/input.json");
-    json input;
-    file >> input;
     challenge = input["challenge"];
   }
+  file.close();
   //std::cout << challenge<< std::endl;
   //Factorio_game factorio;
 
-  Simulator simulator(challenge);
+  Simulator simulator(challenge, first_amount);
   simulator.optimize();
 /*
   simulator.build_items();

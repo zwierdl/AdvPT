@@ -1,5 +1,4 @@
 #include "technology.hpp"
-#include "recipe.hpp"
 #include <iomanip>
 
 Technology::Technology(const std::pair<std::string, json>& input, std::unordered_map<std::string, Item*>& items_blueprint, std::unordered_map<std::string, Recipe*>& recipes_blueprint):

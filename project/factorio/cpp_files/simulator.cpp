@@ -6,7 +6,9 @@
 #include <cstdlib>
 //#include <cassert>
 
-Simulator::Simulator(const std::string& challenge){
+Simulator::Simulator(const std::string& challenge, int first_amount):
+first_amount(first_amount)
+{
 
   std::ifstream in("./factorio-data/item.json");
   json myjson;
@@ -104,11 +106,15 @@ Simulator::Simulator(const std::string& challenge){
   in >> initial;
 
   for (json::iterator i = initial["initial-factories"].begin(); i != initial["initial-factories"].end(); ++i){
-    ++items_blueprint[(*i)["factory-type"]]->stock;
+    //++items_blueprint[(*i)["factory-type"]]->stock;
     Factory*  new_factory = new Factory((*i)["factory-type"], (*i)["factory-id"], (*i)["factory-name"], factories_blueprint);
     factories[(*i)["factory-id"]] = new_factory;
     initial_factories.push_back(*new_factory);
     ++next_factory_index;
+  }
+
+  for (json::iterator i = initial["initial-items"].begin(); i != initial["initial-items"].end(); ++i){
+    items_blueprint[(*i)["name"]]->stock = (*i)["amount"];
   }
 
 
@@ -132,9 +138,9 @@ Simulator::Simulator(const std::string& challenge){
   factories_to_build_in_advance.push_back(Order(items_blueprint["burner-mining-drill"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end(), true));
 
   factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-1"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end(), true));
-  items_and_insert_iterators[0] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-1"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[2] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-1"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[1] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["burner-mining-drill"], --factories_to_build_in_advance.end());
-  items_and_insert_iterators[2] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["stone-furnace"], --factories_to_build_in_advance.end());
+  items_and_insert_iterators[0] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["stone-furnace"], --factories_to_build_in_advance.end());
 
   factories_to_build_in_advance.push_back(Order(items_blueprint["assembling-machine-2"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end(), true));
   factories_to_build_in_advance.push_back(Order(items_blueprint["offshore-pump"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end(), true));
@@ -146,16 +152,35 @@ Simulator::Simulator(const std::string& challenge){
   items_and_insert_iterators[5] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["pumpjack"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[6] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["offshore-pump"], --factories_to_build_in_advance.end());
   items_and_insert_iterators[7] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["assembling-machine-2"], --factories_to_build_in_advance.end());
-
-
-//  factories_to_build_in_advance.push_back(Order(technologies_blueprint["advanced-electronics-2"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
-
-//  factories_to_build_in_advance.push_back(Order(technologies_blueprint["chemical-science-pack"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
-
+  //factories_to_build_in_advance.push_back(Order(technologies_blueprint["advanced-oil-processing"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
+  //factories_to_build_in_advance.push_back(Order(technologies_blueprint["rocket-silo"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
 
 
   factories_to_build_in_advance.push_back(Order(items_blueprint["rocket-silo"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end(), true));
   items_and_insert_iterators[8] = std::pair<Item*, std::list<Order>::iterator>(items_blueprint["rocket-silo"], --factories_to_build_in_advance.end());
+
+
+
+
+  power_set.push_back(std::vector<std::pair<Item*, std::list<Order>::iterator>>(0));
+
+  for (int i = 0; i < items_and_insert_iterators.size(); i++){
+    size_t power_set_size = power_set.size();
+    for (int j = 0; j < power_set_size; ++j){
+      power_set.push_back(power_set[j]);
+      power_set[j].push_back(items_and_insert_iterators[i]);
+    }
+  }
+
+  //power_set.erase(power_set.begin());
+
+  for (std::vector<std::vector<std::pair<Item*, std::list<Order>::iterator>>>::const_reverse_iterator i = power_set.rbegin(); i != power_set.rend(); ++i){
+    if ((*i).size() > 3 || (*i).size() <= 1){
+      power_set.erase(i.base()-1);
+    }
+  }
+
+//  factories_to_build_in_advance.push_back(Order(technologies_blueprint["chemical-science-pack"], 1, std::pair<Recipe*, int>(nullptr,0), build_order.end()));
 
 }
 
@@ -214,14 +239,14 @@ void Simulator::process_order(Order order, std::list<Order>& list, std::list<Ord
     }
     recipe_p = item_p->best_recipe;
 
-    if (item_p->name == "coal" && ((amount_ordered == 1) || (amount_ordered == 2)) ){
+    /*if (item_p->name == "coal" && ((amount_ordered == 1) || (amount_ordered == 2)) ){
       recipe_p.first = recipes_blueprint["coal"];
       recipe_p.second = 1;
-    }
+    }*/
 
-    if (!(item_p->type == "factory")){  //nur fuer die validator-goetter
+    /*if (!(item_p->type == "factory")){  //nur fuer die validator-goetter
       //amount_ordered += 1;
-    }
+    }*/
 
     list.insert(iterator, Order(item_p, amount_ordered, recipe_p, order.purpose, order.establish_factory));
 
@@ -293,7 +318,7 @@ void Simulator::research_Technology(Technology* technology_p, std::list<Order>& 
   for (auto& i : technology_p->ingredients){
     process_order(Order(i.first, i.second, std::pair<Recipe*, int>(nullptr,0), purpose), list, iterator);
   }
-//std::cerr << *technology_p << std::endl;
+//std::cerr << technology_p->name << std::endl;
   technology_p->researched = true;
   for (Recipe* effect : technology_p->effects){
     effect->enabled = true;
@@ -352,11 +377,12 @@ void Simulator::optimize(){
   std::chrono::time_point<std::chrono::steady_clock> right_now;
   std::chrono::duration<double> time_elapsed;
   bool progress = true;
-  for (int amount = 4; amount >=1 && time_elapsed.count() < 60; amount /= 2){
+  //for (int amount = 4; amount >=1 && time_elapsed.count() < 250; amount /= 2){
+  for (int amount = first_amount; amount >= 1; amount /=2){
     //std::cerr << "amount: " << amount << std::endl;
     //std::cerr << "time: " << time_elapsed.count() << std::endl;
     progress = true;
-    while(progress){
+    while(progress && time_elapsed.count() < 60){
       //progress = false;
       while (progress){
         progress = false;
@@ -384,14 +410,46 @@ void Simulator::optimize(){
         }
       }
 
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[0].second, 1), Order(items_and_insert_iterators[0].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[1].second, 1), Order(items_and_insert_iterators[1].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[2].second, 1), Order(items_and_insert_iterators[2].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[3].second, 1), Order(items_and_insert_iterators[3].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[4].second, 1), Order(items_and_insert_iterators[4].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[5].second, 1), Order(items_and_insert_iterators[5].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[6].second, 1), Order(items_and_insert_iterators[6].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
-      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[7].second, 1), Order(items_and_insert_iterators[7].first, amount , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      for (int i = 0; i < power_set.size(); ++i){
+        for (int j = 0; j < power_set[i].size(); ++j){
+          factories_to_build_in_advance.insert(std::next(power_set[i][j].second, 1), Order(power_set[i][j].first, amount, std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+        }
+        build_items();
+        set_Indices();
+        restore_original_state();
+        sort_Orders_by_factories();
+        int duration = generate_events(false);
+        printbuild_order(std::cerr);
+        restore_original_state();
+        /*if (amount <= 4){
+          std::cerr << "duration now: " << duration << ": " << amount << ":"  << item_and_insert_iterator.first->name << std::endl;
+        }*/
+        if (duration < bestmark){
+          progress = true;
+          bestmark = duration;
+          //std::cerr <<  bestmark << ": " << amount << ": ";
+          for (int j = 0; j < power_set[i].size(); ++j){
+            //std::cerr<< power_set[i][j].first->name << " ";
+          }
+          //std::cerr << std::endl;
+          break;
+        }
+        else{
+          for (int j = 0; j < power_set[i].size(); ++j){
+            factories_to_build_in_advance.erase(std::next(power_set[i][j].second, 1));
+          }
+        }
+      }
+
+      /*
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[0].second, 1), Order(items_and_insert_iterators[0].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[1].second, 1), Order(items_and_insert_iterators[1].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[2].second, 1), Order(items_and_insert_iterators[2].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[3].second, 1), Order(items_and_insert_iterators[3].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[4].second, 1), Order(items_and_insert_iterators[4].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[5].second, 1), Order(items_and_insert_iterators[5].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[6].second, 1), Order(items_and_insert_iterators[6].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
+      factories_to_build_in_advance.insert(std::next(items_and_insert_iterators[7].second, 1), Order(items_and_insert_iterators[7].first, 1 , std::pair<Recipe*, int>(nullptr, 0), build_order.end(), true));
 
       build_items();
       set_Indices();
@@ -404,7 +462,7 @@ void Simulator::optimize(){
       if (duration < bestmark){
         progress = true;
         bestmark = duration;
-        //std::cerr <<  bestmark << ": " << amount << ": " << "alles" << std::endl;
+        std::cerr <<  bestmark << ": " << amount << ": " << "alles" << std::endl;
       }
       else{
         factories_to_build_in_advance.erase(std::next(items_and_insert_iterators[7].second, 1));
@@ -416,18 +474,22 @@ void Simulator::optimize(){
         factories_to_build_in_advance.erase(std::next(items_and_insert_iterators[1].second, 1));
         factories_to_build_in_advance.erase(std::next(items_and_insert_iterators[0].second, 1));
       }
+      */
 
-    }
     right_now = std::chrono::steady_clock::now();
     time_elapsed = right_now - begin;
+    }
+
   }
   build_items();
   set_Indices();
   restore_original_state();
   sort_Orders_by_factories();
   generate_events();
-  //printbuild_order(std::cerr);
+  printbuild_order(std::cerr);
   print_events();
+  time_elapsed = right_now - begin;
+  //std::cerr << "time: " << time_elapsed.count() << std::endl;
 
 }
 
@@ -476,12 +538,27 @@ void Simulator::restore_original_state(){
     item_p->calculate_energy(available_categories);
   }
 
+  for(json::iterator i = initial["initial-items"].begin(); i != initial["initial-items"].end(); ++i){
+    items_blueprint[(*i)["name"]]->stock = (*i)["amount"];
+  }
+
   time = 0;
   output.clear();
 }
 
 
 int Simulator::generate_events(bool print_to_json){
+  for (auto& i: factories_blueprint){
+    Factory* f = i.second;
+    for (int j = 0; j < f->stock; j++){
+      Factory* new_factory = new Factory(f->name, next_factory_index, "dummy-factory-name", factories_blueprint);
+      //factories.push_back(new_factory);
+      factories[next_factory_index++] = new_factory;
+      if (print_to_json){
+        output += Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name);
+      }
+    }
+  }
   for (auto& i : factories){
     Factory* factory = i.second;
     find_work(factory, print_to_json);
@@ -537,7 +614,9 @@ int Simulator::generate_events(bool print_to_json){
           Factory* new_factory = new Factory(factories[event.factory_id]->current_job.item->name, next_factory_index, "dummy-factory-name", factories_blueprint);
           //factories.push_back(new_factory);
           factories[next_factory_index++] = new_factory;
-          output += Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name);
+          if (print_to_json){
+            output += Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name);
+          }
 //std::cerr << Build_factory_event(time, new_factory->id, new_factory->name, new_factory->factory_name) <<std::endl;
           find_work(new_factory, print_to_json);
         }
